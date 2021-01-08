@@ -16,8 +16,11 @@ import ListItemIcon from '@material-ui/core/ListItemIcon'
 import ListItemText from '@material-ui/core/ListItemText'
 import Avatar from '@material-ui/core/Avatar'
 import Fab from '@material-ui/core/Fab'
+import IconButton from '@material-ui/core/IconButton'
+
 import SendIcon from '@material-ui/icons/Send'
 import EditIcon from '@material-ui/icons/Edit'
+import MoreVert from '@material-ui/icons/MoreVert'
 
 const useStyles = makeStyles(theme => ({
     table: {
@@ -55,20 +58,59 @@ const useStyles = makeStyles(theme => ({
 
 }));
 
+const Message = (props) => {
+    const classes = useStyles();
+    const [options, setOptions] = useState(false);
+
+    const handleMouseEnter = () => {
+        setOptions(true);
+    }
+    const handleMouseLeave = () => {
+        setOptions(false);
+    }
+
+    return (
+        <ListItem onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+            <Grid container direction={props.dialogue.sender == "player" ? "row-reverse" : "row"} justify="flex-start" alignItems="center">
+                {props.dialogue.sender == "narrator" && <Grid item xs={3} />}
+                <Grid item xs={6} className={clsx(classes.message, props.dialogue.sender == "npc" ? classes.textNpc : props.dialogue.sender == "player" ? classes.textPlayer : classes.textNarrator)}>
+                    <ListItemText align={props.dialogue.sender == "narrator" ? "center" : "left"} color='#000' primary={props.dialogue.text}></ListItemText>
+                </Grid>
+                {options && (
+                    <Grid item xs={1} align={props.dialogue.sender == "player" ? "right" : "left"} style={{ paddingLeft: 16, paddingRight: 16 }}>
+                        <IconButton>
+                            <MoreVert />
+                        </IconButton>
+                    </Grid>
+                )}
+            </Grid>
+        </ListItem>
+    )
+}
+
 const Chat = (props) => {
     const classes = useStyles();
 
-    const dialoguesRef = props.db.collection('/characters/4YzDsre5CT52wVFMnlxI/quests/kSrW6W6feR35lyltmrqZ/dialogs');
+    const dialoguesRef = props.db.collection(`/characters/${props.character.id}/quests/${props.quest.id}/dialogs`);
     const query = dialoguesRef.orderBy('order');
     const [dialogues] = useCollectionData(query, { idField: 'id' });
 
-
-    const [sender, setSender] = useState('');
-
+    const [form, setForm] = useState({ sender: "", text: "" });
     const handleChange = (e) => {
-        setSender(e.target.value)
+        setForm({ ...form, [e.target.name]: e.target.value });
     }
-
+    const addMessage = async () => {
+        if (form.sender && form.text) {
+            await dialoguesRef.add({
+                order: dialogues.length,
+                text: form.text,
+                sender: form.sender
+            })
+                .catch(error => {
+                    alert({ open: true, severity: "error", text: `Błąd: ${error}` });
+                });
+        }
+    }
     return (
         <div>
             <Grid container component={Paper} className={classes.chatSection}>
@@ -113,13 +155,7 @@ const Chat = (props) => {
                 <Grid item xs={9}>
                     <List className={classes.messageArea}>
                         {dialogues && dialogues.map(dialogue => (
-                            <ListItem key={dialogue.id}>
-                                <Grid container justify={dialogue.sender == "npc" ? "flex-start" : dialogue.sender == "player" ? "flex-end" : "center"}>
-                                    <Grid item xs={8} className={clsx(classes.message, dialogue.sender == "npc" ? classes.textNpc : dialogue.sender == "player" ? classes.textPlayer : classes.textNarrator)}>
-                                        <ListItemText align={dialogue.sender == "narrator" ? "center" : "left"} color='#000' primary={dialogue.text}></ListItemText>
-                                    </Grid>
-                                </Grid>
-                            </ListItem>
+                            <Message key={dialogue.id} dialogue={dialogue} />
                         ))}
                     </List>
                     <Divider />
@@ -127,7 +163,7 @@ const Chat = (props) => {
                         <Grid item xs={3}>
                             <FormControl variant="outlined" fullWidth>
                                 <InputLabel id="senderSelectLabelId">Mówca</InputLabel>
-                                <Select id="senderSelect" labelId="senderSelectLabelId" label="Mówca" value={sender} onChange={handleChange}>
+                                <Select name="sender" key="sender" labelId="senderSelectLabelId" label="Mówca" value={form.sender} onChange={handleChange}>
                                     <MenuItem value='npc'>NPC</MenuItem>
                                     <MenuItem value='player'>Gracz</MenuItem>
                                     <MenuItem value='narrator'>Narrator</MenuItem>
@@ -135,10 +171,10 @@ const Chat = (props) => {
                             </FormControl>
                         </Grid>
                         <Grid item xs={8}>
-                            <TextField id="messageBox" label="Tekst" fullWidth variant="outlined" noValidate />
+                            <TextField name="text" label="Tekst" fullWidth variant="outlined" noValidate inputProps={{ maxLength: 246 }} value={form.text} onChange={handleChange} />
                         </Grid>
                         <Grid item xs={1}>
-                            <Fab color="primary" aria-label="add"><SendIcon /></Fab>
+                            <Fab color="primary" aria-label="add" onClick={addMessage}><SendIcon /></Fab>
                         </Grid>
                     </Grid>
                 </Grid>

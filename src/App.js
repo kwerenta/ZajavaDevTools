@@ -1,16 +1,17 @@
-import React, { useState } from 'react';
-import './App.css';
+import React, { useState } from 'react'
+import './App.css'
 import Navigation from './components/Navigation'
 import Dashboard from './components/Dashboard'
 import Quests from './components/Quests'
 import Items from './components/Items'
 
-import firebase from 'firebase/app';
-import 'firebase/auth';
-import { useAuthState } from 'react-firebase-hooks/auth';
+import firebase from 'firebase/app'
+import 'firebase/auth'
+import 'firebase/firestore'
+import { useAuthState } from 'react-firebase-hooks/auth'
 
-import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
+import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles'
+import Button from '@material-ui/core/Button'
 
 if (!firebase.apps.length) {
   firebase.initializeApp({
@@ -54,7 +55,7 @@ function App() {
     switch (screen) {
       case "Pulpit":
         return <Dashboard user={user} db={db} />
-      case "Questy":
+      case "Zadania":
         return <Quests db={db} />
       case "Przedmioty":
         return <Items />

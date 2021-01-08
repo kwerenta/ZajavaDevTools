@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import QuestEditor from './QuestEditor'
+import Confirmation from './Confirmation'
 
 import { makeStyles } from '@material-ui/core/styles'
 import Box from '@material-ui/core/Box'
@@ -34,34 +35,6 @@ import { useCollectionData } from 'react-firebase-hooks/firestore'
 
 function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
-
-function Confirmation(props) {
-    return (
-        <div>
-            <Dialog
-                open={props.openConfirmation}
-                onClose={props.handleCloseConfirmation}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title">{"Potwierdzenie"}</DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                        Czy na pewno chcesz usunąć tę postać? Operacji nie będzie można już cofnąć.
-              </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={props.handleCloseConfirmation} color="primary">
-                        Anuluj
-              </Button>
-                    <Button onClick={props.deleteCharacter} color="secondary">
-                        Usuń
-              </Button>
-                </DialogActions>
-            </Dialog>
-        </div>
-    );
 }
 
 const useRowStyles = makeStyles({
@@ -157,11 +130,11 @@ export default function Quests(props) {
     const [openEditor, setOpenEditor] = useState(false);
 
     const handleChange = (e) => {
-        setForm({ ...form, [e.target.id]: e.target.value });
-        if (['name', 'location'].includes(e.target.id)) {
+        setForm({ ...form, [e.target.name]: e.target.value });
+        if (['name', 'location'].includes(e.target.name)) {
             e.target.value == "" ?
-                setFormError({ ...formError, [e.target.id]: true }) :
-                setFormError({ ...formError, [e.target.id]: false })
+                setFormError({ ...formError, [e.target.name]: true }) :
+                setFormError({ ...formError, [e.target.name]: false })
         }
     }
 
@@ -201,6 +174,17 @@ export default function Quests(props) {
         props.db.collection("characters").doc(characterId).delete()
             .then(() => {
                 setSnack({ open: true, severity: "success", text: "Postać została usunięta!" });
+            })
+            .catch(error => {
+                setSnack({ open: true, severity: "error", text: `Błąd: ${error}` });
+            });
+    }
+    const addQuest = async () => {
+        await charactersRef.add({
+            name: form.name,
+        })
+            .then(() => {
+                setSnack({ open: true, severity: "success", text: "Postać dodano zadanie do wybranej postaci!" });
             })
             .catch(error => {
                 setSnack({ open: true, severity: "error", text: `Błąd: ${error}` });
@@ -316,7 +300,7 @@ export default function Quests(props) {
                         variant="outlined"
                         autoFocus
                         margin="dense"
-                        id="name"
+                        name="name"
                         label="Nazwa"
                         fullWidth
                         value={form.name}
@@ -327,7 +311,7 @@ export default function Quests(props) {
                         error={formError.location}
                         variant="outlined"
                         margin="dense"
-                        id="location"
+                        name="location"
                         label="Lokalizacja"
                         fullWidth
                         value={form.location}
@@ -336,7 +320,7 @@ export default function Quests(props) {
                     <TextField
                         variant="outlined"
                         margin="dense"
-                        id="occupation"
+                        name="occupation"
                         label="Zajęcie"
                         fullWidth
                         value={form.occupation}
@@ -345,7 +329,7 @@ export default function Quests(props) {
                     <TextField
                         variant="outlined"
                         margin="dense"
-                        id="skin"
+                        name="skin"
                         label="Skin URL"
                         fullWidth
                         value={form.skin}
@@ -373,7 +357,13 @@ export default function Quests(props) {
 
             <QuestEditor open={openEditor} handleClose={handleCloseEditor} characters={characters} characterId={characterId} questId={questId} db={props.db} />
 
-            <Confirmation deleteCharacter={deleteCharacter} openConfirmation={openConfirmation} handleCloseConfirmation={handleCloseConfirmation} />
+            <Confirmation
+                actionText="Usuń"
+                actionClick={deleteCharacter}
+                openConfirmation={openConfirmation}
+                handleCloseConfirmation={handleCloseConfirmation}
+                text="Czy na pewno chcesz usunąć tę postać? Operacji nie będzie można już cofnąć."
+            />
 
             <Snackbar open={snack.open} autoHideDuration={6000} onClose={handleCloseSnackbar}>
                 <Alert onClose={handleCloseSnackbar} severity={snack.severity}>{snack.text}</Alert>

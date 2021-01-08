@@ -70,7 +70,7 @@ export default function Navigation(props) {
             onKeyDown={toggleDrawer(false)}
         >
             <List>
-                {['Pulpit', 'Questy', 'Przedmioty'].map((text, index) => (
+                {['Pulpit', 'Zadania', 'Przedmioty'].map((text, index) => (
                     <ListItem button key={text} onClick={() => { index != 2 ? props.setScreen(text) : handleClick() }}>
                         <ListItemIcon>{index == 0 ? <HomeIcon /> : index == 1 ? <QuestionAnswerIcon /> : <EditIcon />}</ListItemIcon>
                         <ListItemText primary={text} />
