@@ -51,7 +51,7 @@ function Row(props) {
     const classes = useRowStyles();
 
     return (
-        <React.Fragment>
+        <>
             <TableRow className={classes.root}>
                 <TableCell>
                     <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
@@ -112,7 +112,7 @@ function Row(props) {
                     </Collapse>
                 </TableCell>
             </TableRow>
-        </React.Fragment>
+        </>
     );
 }
 
@@ -264,7 +264,7 @@ export default function Quests(props) {
     }, [characterId]);
 
     return (
-        <div>
+        <>
             <TableContainer component={Paper}>
                 <Table aria-label="collapsible table">
                     <TableHead style={{ backgroundColor: '#000' }}>
@@ -368,6 +368,6 @@ export default function Quests(props) {
             <Snackbar open={snack.open} autoHideDuration={6000} onClose={handleCloseSnackbar}>
                 <Alert onClose={handleCloseSnackbar} severity={snack.severity}>{snack.text}</Alert>
             </Snackbar>
-        </div>
+        </>
     );
 }

@@ -8,7 +8,7 @@ import Button from '@material-ui/core/Button'
 
 export default function Confirmation(props) {
     return (
-        <div>
+        <>
             <Dialog
                 open={props.openConfirmation}
                 onClose={props.handleCloseConfirmation}
@@ -30,6 +30,6 @@ export default function Confirmation(props) {
                     </Button>
                 </DialogActions>
             </Dialog>
-        </div>
+        </>
     );
 }

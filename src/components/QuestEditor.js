@@ -31,7 +31,7 @@ export default function QuestEditor(props) {
     const quest = character && character.quests.find(quest => quest.id === props.questId);
 
     return (
-        <div>
+        <>
             <Dialog fullScreen open={props.open} onClose={props.handleClose} TransitionComponent={Transition}>
                 <AppBar className={classes.appBar}>
                     <Toolbar>
@@ -41,15 +41,12 @@ export default function QuestEditor(props) {
                         <Typography variant="h6" className={classes.title}>
                             Edytor zadań
                         </Typography>
-                        <Button autoFocus color="inherit" onClick={props.handleClose}>
-                            Zapisz
-            </Button>
                     </Toolbar>
                 </AppBar>
 
                 <Dialogues character={character} quest={quest} db={props.db} />
 
             </Dialog>
-        </div>
+        </>
     );
 }

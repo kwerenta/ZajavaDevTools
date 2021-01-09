@@ -55,7 +55,7 @@ export default function Dashboard(props) {
     }
 
     return (
-        <div>
+        <>
             <Grid
                 container
                 direction="row"
@@ -110,7 +110,7 @@ export default function Dashboard(props) {
                     <Card className={classes.card} variant="outlined">
                         <CardContent>
                             <Typography variant="h4" component="h2">
-                                halo jak się robi design
+                                wygląd się nie liczy
                         </Typography>
                             <Typography variant="body2" component="p">
                             </Typography>
@@ -123,6 +123,6 @@ export default function Dashboard(props) {
             <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
                 <Alert onClose={handleClose} severity="warning">Ta funkcja jest jeszcze w trakcie przygotowywania!</Alert>
             </Snackbar>
-        </div >
+        </>
     )
 }

@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react'
+import Confirmation from './Confirmation'
+
 import { useCollectionData } from 'react-firebase-hooks/firestore'
 import { makeStyles } from '@material-ui/core/styles'
 import clsx from 'clsx'
@@ -16,11 +18,14 @@ import ListItemIcon from '@material-ui/core/ListItemIcon'
 import ListItemText from '@material-ui/core/ListItemText'
 import Avatar from '@material-ui/core/Avatar'
 import Fab from '@material-ui/core/Fab'
+import Grow from '@material-ui/core/Grow'
+import Tooltip from '@material-ui/core/Tooltip'
 import IconButton from '@material-ui/core/IconButton'
 
 import SendIcon from '@material-ui/icons/Send'
 import EditIcon from '@material-ui/icons/Edit'
-import MoreVert from '@material-ui/icons/MoreVert'
+import DeleteIcon from '@material-ui/icons/Delete'
+import AddIcon from '@material-ui/icons/Add'
 
 const useStyles = makeStyles(theme => ({
     table: {
@@ -38,13 +43,15 @@ const useStyles = makeStyles(theme => ({
         borderRight: '1px solid #e0e0e0'
     },
     messageArea: {
-        height: '80vh',
+        height: '79vh',
         overflowY: 'auto'
     },
     message: {
         padding: theme.spacing(1.5),
         paddingLeft: theme.spacing(2.5),
-        borderRadius: theme.spacing(2)
+        paddingRight: theme.spacing(2.5),
+        borderRadius: theme.spacing(2),
+        maxWidth: '50%'
     },
     textPlayer: {
         backgroundColor: '#b02e26'
@@ -59,6 +66,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const Message = (props) => {
+    const { dialogue } = props;
     const classes = useStyles();
     const [options, setOptions] = useState(false);
 
@@ -71,18 +79,40 @@ const Message = (props) => {
 
     return (
         <ListItem onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-            <Grid container direction={props.dialogue.sender == "player" ? "row-reverse" : "row"} justify="flex-start" alignItems="center">
-                {props.dialogue.sender == "narrator" && <Grid item xs={3} />}
-                <Grid item xs={6} className={clsx(classes.message, props.dialogue.sender == "npc" ? classes.textNpc : props.dialogue.sender == "player" ? classes.textPlayer : classes.textNarrator)}>
-                    <ListItemText align={props.dialogue.sender == "narrator" ? "center" : "left"} color='#000' primary={props.dialogue.text}></ListItemText>
+            <Grid container direction={dialogue.sender == "player" ? "row-reverse" : "row"} justify="flex-start" alignItems="center">
+
+                {dialogue.sender == "narrator" && <Grid item xs={3} />}
+
+                <Grid item xs={dialogue.sender == "narrator" && 6} className={clsx(classes.message, dialogue.sender == "npc" ? classes.textNpc : dialogue.sender == "player" ? classes.textPlayer : classes.textNarrator)}>
+                    <ListItemText align={dialogue.sender == "narrator" ? "center" : "left"} primary={dialogue.text}></ListItemText>
                 </Grid>
+
                 {options && (
-                    <Grid item xs={1} align={props.dialogue.sender == "player" ? "right" : "left"} style={{ paddingLeft: 16, paddingRight: 16 }}>
-                        <IconButton>
-                            <MoreVert />
-                        </IconButton>
+                    <Grid container item direction={dialogue.sender == "player" ? "row-reverse" : "row"} xs={2} style={{ paddingLeft: 16, paddingRight: 16 }}>
+                        <Grow in={options} timeout={500}>
+                            <Tooltip title="Edytuj wiadomość" arrow>
+                                <IconButton onClick={() => { props.handleClickEdit(dialogue.id) }} size="small">
+                                    <EditIcon />
+                                </IconButton>
+                            </Tooltip>
+                        </Grow>
+                        {/* <Grow in={options} timeout={500}>
+                            <Tooltip title="Wstaw wiadomość poniżej" arrow>
+                                <IconButton disabled onClick={() => { props.handleClickEdit(dialogue.id) }} size="small">
+                                    <AddIcon />
+                                </IconButton>
+                            </Tooltip>
+                        </Grow> */}
+                        <Grow in={options} timeout={500}>
+                            <Tooltip title="Usuń wiadomość" arrow>
+                                <IconButton onClick={() => { props.handleClickDelete(dialogue.id) }} size="small">
+                                    <DeleteIcon />
+                                </IconButton>
+                            </Tooltip>
+                        </Grow>
                     </Grid>
                 )}
+
             </Grid>
         </ListItem>
     )
@@ -95,24 +125,79 @@ const Chat = (props) => {
     const query = dialoguesRef.orderBy('order');
     const [dialogues] = useCollectionData(query, { idField: 'id' });
 
+    const dummy = useRef();
+
     const [form, setForm] = useState({ sender: "", text: "" });
+    const [messageId, setMessageId] = useState("");
+    const [openConfirmation, setOpenConfirmation] = useState(false);
+    const [edit, setEdit] = useState(false);
+
+    const handleClickDelete = (id) => {
+        setMessageId(id);
+        setOpenConfirmation(true);
+    };
+    const handleClickEdit = (id) => {
+        setMessageId(id);
+        setEdit(true);
+    }
+
+    useEffect(() => {
+        if (dialogues && messageId != "" && edit) {
+            const dialogue = dialogues.find(dialogue => dialogue.id === messageId);
+            setForm({ sender: dialogue.sender, text: dialogue.text, order: dialogue.order });
+        }
+    }, [messageId]);
+
+    const handleCloseConfirmation = () => {
+        setOpenConfirmation(false);
+    }
+
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     }
+
     const addMessage = async () => {
         if (form.sender && form.text) {
+            const prevOrder = dialogues[dialogues.length - 1].order;
             await dialoguesRef.add({
-                order: dialogues.length,
+                order: prevOrder + 1,
                 text: form.text,
                 sender: form.sender
             })
+                .then(() => {
+                    dummy.current.scrollIntoView({ behavior: 'smooth' });
+                    setForm({ sender: "", text: "" });
+                })
                 .catch(error => {
                     alert({ open: true, severity: "error", text: `Błąd: ${error}` });
                 });
         }
     }
+    const editMessage = () => {
+        if (form.sender && form.text) {
+            dialoguesRef.doc(messageId)
+                .update({
+                    order: form.order,
+                    text: form.text,
+                    sender: form.sender,
+                })
+                .then(() => {
+                    setForm({ sender: "", text: "" });
+                    setEdit(false);
+                    setMessageId('');
+                })
+                .catch(error => {
+                    alert({ open: true, severity: "error", text: `Błąd: ${error}` });
+                });
+        }
+    }
+    const deleteMessage = () => {
+        handleCloseConfirmation();
+        props.db.doc(`/characters/${props.character.id}/quests/${props.quest.id}/dialogs/${messageId}`).delete();
+    }
+
     return (
-        <div>
+        <>
             <Grid container component={Paper} className={classes.chatSection}>
                 <Grid item xs={3} className={classes.borderRight500}>
                     <List>
@@ -126,25 +211,25 @@ const Chat = (props) => {
                     </List>
                     <Divider />
                     <List>
-                        <ListItem button key="requirements">
+                        <ListItem button disabled key="requirements">
                             <ListItemIcon>
                                 <EditIcon />
                             </ListItemIcon>
                             <ListItemText primary="Wymagania startowe"></ListItemText>
                         </ListItem>
-                        <ListItem button key="rewardsStart">
+                        <ListItem button disabled key="rewardsStart">
                             <ListItemIcon>
                                 <EditIcon />
                             </ListItemIcon>
                             <ListItemText primary="Nagroda startowa"></ListItemText>
                         </ListItem>
-                        <ListItem button key="rewards">
+                        <ListItem button disabled key="rewards">
                             <ListItemIcon>
                                 <EditIcon />
                             </ListItemIcon>
                             <ListItemText primary="Nagroda końcowa"></ListItemText>
                         </ListItem>
-                        <ListItem button key="othernpcs">
+                        <ListItem button disabled key="othernpcs">
                             <ListItemIcon>
                                 <EditIcon />
                             </ListItemIcon>
@@ -154,9 +239,23 @@ const Chat = (props) => {
                 </Grid>
                 <Grid item xs={9}>
                     <List className={classes.messageArea}>
+
                         {dialogues && dialogues.map(dialogue => (
-                            <Message key={dialogue.id} dialogue={dialogue} />
+                            <Message key={dialogue.id} dialogue={dialogue} handleClickDelete={handleClickDelete} handleClickEdit={handleClickEdit} />
                         ))}
+
+                        <ListItem button disabled>
+                            <Grid container justify="center" alignItems="center">
+
+                                <Grid item xs={3} className={classes.message} style={{ backgroundColor: '#888' }}>
+                                    <ListItemText align="center" primary="Dodaj nowy etap"></ListItemText>
+                                </Grid>
+
+                            </Grid>
+                        </ListItem>
+
+                        <span ref={dummy}></span>
+
                     </List>
                     <Divider />
                     <Grid container style={{ padding: '20px' }} spacing={4}>
@@ -171,15 +270,31 @@ const Chat = (props) => {
                             </FormControl>
                         </Grid>
                         <Grid item xs={8}>
-                            <TextField name="text" label="Tekst" fullWidth variant="outlined" noValidate inputProps={{ maxLength: 246 }} value={form.text} onChange={handleChange} />
+                            <TextField multiline name="text" label="Tekst" fullWidth variant="outlined" noValidate inputProps={{ maxLength: 246 }} value={form.text} onChange={handleChange} />
                         </Grid>
                         <Grid item xs={1}>
-                            <Fab color="primary" aria-label="add" onClick={addMessage}><SendIcon /></Fab>
+
+                            {edit ?
+                                <Fab color="secondary" aria-label="edit" onClick={editMessage}><EditIcon /></Fab>
+                                :
+                                <Fab color="primary" aria-label="add" onClick={addMessage}><SendIcon /></Fab>}
+
                         </Grid>
                     </Grid>
                 </Grid>
             </Grid>
-        </div>
+
+            <Confirmation
+                actionText="Usuń"
+                actionClick={deleteMessage}
+                openConfirmation={openConfirmation}
+                handleCloseConfirmation={handleCloseConfirmation}
+                text={
+                    edit ? "Czy na pewno chcesz zedytować tę kwestię? Operacji nie będzie można już cofnąć."
+                        : "Czy na pewno chcesz usunąć tę kwestię? Operacji nie będzie można już cofnąć."}
+            />
+
+        </>
     );
 }
 
