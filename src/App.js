@@ -8,6 +8,7 @@ import Items from './components/Items'
 import firebase from 'firebase/app'
 import 'firebase/auth'
 import 'firebase/firestore'
+import 'firebase/analytics'
 import { useAuthState } from 'react-firebase-hooks/auth'
 
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles'
@@ -30,6 +31,7 @@ if (!firebase.apps.length) {
 const auth = firebase.auth();
 const provider = new firebase.auth.GoogleAuthProvider();
 const db = firebase.firestore();
+const analytics = firebase.analytics();
 
 const theme = createMuiTheme({
   palette: {
@@ -50,13 +52,13 @@ function App() {
 
   const [user] = useAuthState(auth);
   const [screen, setScreen] = useState("Pulpit");
-
+  console.log(user);
   function activeScreen() {
     switch (screen) {
       case "Pulpit":
         return <Dashboard user={user} db={db} />
       case "Zadania":
-        return <Quests db={db} />
+        return <Quests db={db} user={user} />
       case "Przedmioty":
         return <Items />
       default:

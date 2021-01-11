@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import Confirmation from './Confirmation'
+import Snackalert from './Snackalert'
 
 import { useCollectionData } from 'react-firebase-hooks/firestore'
 import { makeStyles } from '@material-ui/core/styles'
@@ -121,7 +122,7 @@ const Message = (props) => {
 const Chat = (props) => {
     const classes = useStyles();
 
-    const dialoguesRef = props.db.collection(`/characters/${props.character.id}/quests/${props.quest.id}/dialogs`);
+    const dialoguesRef = props.db.collection(`/characters/${props.character.id}/quests/${props.quest.id}/dialogues`);
     const query = dialoguesRef.orderBy('order');
     const [dialogues] = useCollectionData(query, { idField: 'id' });
 
@@ -131,6 +132,7 @@ const Chat = (props) => {
     const [messageId, setMessageId] = useState("");
     const [openConfirmation, setOpenConfirmation] = useState(false);
     const [edit, setEdit] = useState(false);
+    const [snack, setSnack] = useState({ open: false, severity: "", text: "" });
 
     const handleClickDelete = (id) => {
         setMessageId(id);
@@ -151,6 +153,9 @@ const Chat = (props) => {
     const handleCloseConfirmation = () => {
         setOpenConfirmation(false);
     }
+    const handleCloseSnackbar = () => {
+        setSnack({ ...snack, open: false });
+    }
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -158,7 +163,7 @@ const Chat = (props) => {
 
     const addMessage = async () => {
         if (form.sender && form.text) {
-            const prevOrder = dialogues[dialogues.length - 1].order;
+            const prevOrder = dialogues.length === 0 ? -1 : dialogues[dialogues.length - 1].order;
             await dialoguesRef.add({
                 order: prevOrder + 1,
                 text: form.text,
@@ -169,7 +174,7 @@ const Chat = (props) => {
                     setForm({ sender: "", text: "" });
                 })
                 .catch(error => {
-                    alert({ open: true, severity: "error", text: `Błąd: ${error}` });
+                    setSnack({ open: true, severity: "error", text: `Błąd: ${error}` });
                 });
         }
     }
@@ -187,13 +192,13 @@ const Chat = (props) => {
                     setMessageId('');
                 })
                 .catch(error => {
-                    alert({ open: true, severity: "error", text: `Błąd: ${error}` });
+                    setSnack({ open: true, severity: "error", text: `Błąd: ${error}` });
                 });
         }
     }
     const deleteMessage = () => {
         handleCloseConfirmation();
-        props.db.doc(`/characters/${props.character.id}/quests/${props.quest.id}/dialogs/${messageId}`).delete();
+        props.db.doc(`/characters/${props.character.id}/quests/${props.quest.id}/dialogues/${messageId}`).delete();
     }
 
     return (
@@ -293,6 +298,8 @@ const Chat = (props) => {
                     edit ? "Czy na pewno chcesz zedytować tę kwestię? Operacji nie będzie można już cofnąć."
                         : "Czy na pewno chcesz usunąć tę kwestię? Operacji nie będzie można już cofnąć."}
             />
+
+            <Snackalert snack={snack} handleClose={handleCloseSnackbar} />
 
         </>
     );

@@ -2,7 +2,6 @@ import React from 'react'
 import Dialogues from './Dialogues'
 
 import { makeStyles } from '@material-ui/core/styles'
-import Button from '@material-ui/core/Button'
 import Dialog from '@material-ui/core/Dialog'
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
@@ -28,7 +27,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 export default function QuestEditor(props) {
     const classes = useStyles();
     const character = props.characters && props.characters.find(character => character.id === props.characterId);
-    const quest = character && character.quests.find(quest => quest.id === props.questId);
+    const quest = character && character.quests && character.quests.find(quest => quest.id === props.questId);
 
     return (
         <>

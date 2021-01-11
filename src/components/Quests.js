@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import QuestEditor from './QuestEditor'
 import Confirmation from './Confirmation'
+import Snackalert from './Snackalert'
 
 import { makeStyles } from '@material-ui/core/styles'
 import Box from '@material-ui/core/Box'
@@ -22,9 +23,11 @@ import DialogTitle from '@material-ui/core/DialogTitle'
 import DialogContent from '@material-ui/core/DialogContent'
 import DialogActions from '@material-ui/core/DialogActions'
 import DialogContentText from '@material-ui/core/DialogContentText'
-import Snackbar from '@material-ui/core/Snackbar'
-import MuiAlert from '@material-ui/lab/Alert'
+import Chip from '@material-ui/core/Chip'
 
+import DoneIcon from '@material-ui/icons/Done'
+import DoneAllIcon from '@material-ui/icons/DoneAll'
+import MessageIcon from '@material-ui/icons/Message'
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
 import EditIcon from '@material-ui/icons/Edit'
@@ -32,10 +35,6 @@ import AddIcon from '@material-ui/icons/Add'
 import DeleteIcon from '@material-ui/icons/Delete'
 
 import { useCollectionData } from 'react-firebase-hooks/firestore'
-
-function Alert(props) {
-    return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
 
 const useRowStyles = makeStyles({
     root: {
@@ -49,6 +48,11 @@ function Row(props) {
     const { row } = props;
     const [open, setOpen] = useState(false);
     const classes = useRowStyles();
+    const statusChips = [
+        { label: 'W trakcie pisania', color: '#00695c', icon: <MessageIcon /> },
+        { label: 'Ukończony', color: '#2e7d32', icon: <DoneIcon /> },
+        { label: 'Przeniesiony do gry', color: '#33691e', icon: <DoneAllIcon /> }
+    ]
 
     return (
         <>
@@ -61,10 +65,10 @@ function Row(props) {
                 <TableCell component="th" scope="row">
                     {row.name}
                 </TableCell>
-                <TableCell>{row.occupation}</TableCell>
                 <TableCell>{row.location}</TableCell>
+                <TableCell>{row.occupation}</TableCell>
                 <TableCell>
-                    <IconButton aria-label="open character editor" size="small" onClick={() => { props.handleClickOpen(true, row.id); }}>
+                    <IconButton aria-label="open character editor" size="small" onClick={() => { props.handleClickOpen(true, false, row.id); }}>
                         <EditIcon />
                     </IconButton>
                 </TableCell>
@@ -75,11 +79,12 @@ function Row(props) {
                         <Box margin={1}>
                             <Typography variant="h6" gutterBottom component="div">
                                 Zadania
-              </Typography>
+                            </Typography>
                             <Table size="small" aria-label="purchases">
                                 <TableHead>
                                     <TableRow>
                                         <TableCell>Nazwa</TableCell>
+                                        <TableCell>Status</TableCell>
                                         <TableCell />
                                     </TableRow>
                                 </TableHead>
@@ -88,6 +93,14 @@ function Row(props) {
                                         <TableRow key={quest.name}>
                                             <TableCell>
                                                 {quest.name}
+                                            </TableCell>
+                                            <TableCell>
+                                                {!isNaN(quest.status) &&
+                                                    <Chip
+                                                        style={{ backgroundColor: statusChips[quest.status].color }}
+                                                        icon={statusChips[quest.status].icon}
+                                                        label={statusChips[quest.status].label}
+                                                    />}
                                             </TableCell>
                                             <TableCell>
                                                 <IconButton aria-label="open quest editor" size="small" onClick={() => { props.handleClickOpenEditor(row.id, quest.id) }}>
@@ -100,8 +113,9 @@ function Row(props) {
                                         <TableCell>
                                             Dodaj zadanie
                                         </TableCell>
+                                        <TableCell />
                                         <TableCell>
-                                            <IconButton aria-label="add quest" size="small">
+                                            <IconButton aria-label="add quest" size="small" onClick={() => { props.handleClickOpen(false, true, row.id); }}>
                                                 <AddIcon />
                                             </IconButton>
                                         </TableCell>
@@ -122,6 +136,7 @@ export default function Quests(props) {
     const [openConfirmation, setOpenConfirmation] = useState(false);
 
     const [edit, setEdit] = useState(false);
+    const [quest, setQuest] = useState(false);
     const [form, setForm] = useState({ name: "", location: "", skin: "", occupation: "" })
     const [formError, setFormError] = useState({ name: false, location: false });
     const [characterId, setCharacterId] = useState("");
@@ -138,9 +153,10 @@ export default function Quests(props) {
         }
     }
 
-    const handleClickOpen = (edit, id) => {
+    const handleClickOpen = (edit, quest, id) => {
         setOpen(true);
         setEdit(edit);
+        setQuest(quest);
         setCharacterId(id);
         !edit && setForm({ name: "", location: "", skin: "", occupation: "" });
         setFormError({ name: false, location: false });
@@ -180,15 +196,25 @@ export default function Quests(props) {
             });
     }
     const addQuest = async () => {
-        await charactersRef.add({
-            name: form.name,
-        })
-            .then(() => {
-                setSnack({ open: true, severity: "success", text: "Postać dodano zadanie do wybranej postaci!" });
+        if (form.name) {
+            await props.db.collection('characters').doc(characterId).collection('quests').add({
+                name: form.name,
+                status: 0
             })
-            .catch(error => {
-                setSnack({ open: true, severity: "error", text: `Błąd: ${error}` });
+                .then(() => {
+                    setSnack({ open: true, severity: "success", text: "Dodano zadanie do wybranej postaci!" });
+                })
+                .catch(error => {
+                    setSnack({ open: true, severity: "error", text: `Błąd: ${error}` });
+                });
+            handleClose();
+        }
+        else {
+            setSnack({ open: true, severity: "error", text: `Pola nazwa musi być wypełnione!` });
+            setFormError({
+                name: form.name == "" ? true : false
             });
+        }
     }
     const handleSubmit = async () => {
         if (form.name && form.location) {
@@ -197,7 +223,8 @@ export default function Quests(props) {
                     name: form.name,
                     location: form.location,
                     occupation: form.occupation,
-                    skin: form.skin
+                    skin: form.skin,
+                    createdBy: props.user.uid
                 })
                     .then(() => {
                         setSnack({ open: true, severity: "success", text: "Postać została utworzona!" });
@@ -271,8 +298,8 @@ export default function Quests(props) {
                         <TableRow>
                             <TableCell />
                             <TableCell>Nazwa</TableCell>
-                            <TableCell>Zajęcie</TableCell>
                             <TableCell>Lokalizacja</TableCell>
+                            <TableCell>Zajęcie</TableCell>
                             <TableCell />
                         </TableRow>
                     </TableHead>
@@ -289,11 +316,11 @@ export default function Quests(props) {
             </Fab>
 
             <Dialog open={open} onClose={handleClose} aria-labelledby="character-creator">
-                <DialogTitle id="form-dialog-title">Kreator postaci</DialogTitle>
+                <DialogTitle id="form-dialog-title">{quest ? "Kreator zadań" : "Kreator postaci"}</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        Ten jakże zaawansowany kreator postaci pozwala na {edit ? 'edycję' : 'dodanie'} zleceniodawcy, który będzie dostępny na serwerze ZajvaCraft.
-                        </DialogContentText>
+                        {quest ? `Napisz nazwę zadania, które zlecać będzie wybrana przez Ciebie postać` : `Ten jakże zaawansowany kreator postaci pozwala na ${edit ? 'edycję' : 'dodanie'} zleceniodawcy, który będzie dostępny na serwerze ZajvaCraft.`}
+                    </DialogContentText>
                     <TextField
                         required
                         error={formError.name}
@@ -306,35 +333,37 @@ export default function Quests(props) {
                         value={form.name}
                         onChange={handleChange}
                     />
-                    <TextField
-                        required
-                        error={formError.location}
-                        variant="outlined"
-                        margin="dense"
-                        name="location"
-                        label="Lokalizacja"
-                        fullWidth
-                        value={form.location}
-                        onChange={handleChange}
-                    />
-                    <TextField
-                        variant="outlined"
-                        margin="dense"
-                        name="occupation"
-                        label="Zajęcie"
-                        fullWidth
-                        value={form.occupation}
-                        onChange={handleChange}
-                    />
-                    <TextField
-                        variant="outlined"
-                        margin="dense"
-                        name="skin"
-                        label="Skin URL"
-                        fullWidth
-                        value={form.skin}
-                        onChange={handleChange}
-                    />
+                    {!quest && <>
+                        <TextField
+                            required
+                            error={formError.location}
+                            variant="outlined"
+                            margin="dense"
+                            name="location"
+                            label="Lokalizacja"
+                            fullWidth
+                            value={form.location}
+                            onChange={handleChange}
+                        />
+                        <TextField
+                            variant="outlined"
+                            margin="dense"
+                            name="occupation"
+                            label="Zajęcie"
+                            fullWidth
+                            value={form.occupation}
+                            onChange={handleChange}
+                        />
+                        <TextField
+                            variant="outlined"
+                            margin="dense"
+                            name="skin"
+                            label="Skin URL"
+                            fullWidth
+                            value={form.skin}
+                            onChange={handleChange}
+                        />
+                    </>}
 
                 </DialogContent>
                 <DialogActions>
@@ -349,7 +378,7 @@ export default function Quests(props) {
                     <Button onClick={handleClose} color="primary">
                         Anuluj
                         </Button>
-                    <Button onClick={handleSubmit} variant="contained" color="primary">
+                    <Button onClick={quest ? addQuest : handleSubmit} variant="contained" color="primary">
                         {edit ? 'Edytuj' : 'Utwórz'}
                     </Button>
                 </DialogActions>
@@ -365,9 +394,7 @@ export default function Quests(props) {
                 text="Czy na pewno chcesz usunąć tę postać? Operacji nie będzie można już cofnąć."
             />
 
-            <Snackbar open={snack.open} autoHideDuration={6000} onClose={handleCloseSnackbar}>
-                <Alert onClose={handleCloseSnackbar} severity={snack.severity}>{snack.text}</Alert>
-            </Snackbar>
+            <Snackalert snack={snack} handleClose={handleCloseSnackbar} />
         </>
     );
 }

@@ -71,7 +71,7 @@ export default function Dashboard(props) {
                                 Witaj, {props.user.displayName}!
                     </Typography>
                             <Typography variant="body2" component="p">
-                                Twoje ranga to: {user && user.ranga}
+                                Twoje ranga to: {user && user.rank}
                             </Typography>
                         </CardContent>
                     </Card>
