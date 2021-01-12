@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import QuestEditor from './QuestEditor'
-import Confirmation from './Confirmation'
-import Snackalert from './Snackalert'
+import QuestEditor from '../components/QuestEditor'
+import Confirmation from '../components/Confirmation'
+import Snackalert from '../components/Snackalert'
 
 import { makeStyles } from '@material-ui/core/styles'
 import Box from '@material-ui/core/Box'
@@ -24,6 +24,8 @@ import DialogContent from '@material-ui/core/DialogContent'
 import DialogActions from '@material-ui/core/DialogActions'
 import DialogContentText from '@material-ui/core/DialogContentText'
 import Chip from '@material-ui/core/Chip'
+import Backdrop from '@material-ui/core/Backdrop'
+import CircularProgress from '@material-ui/core/CircularProgress'
 
 import DoneIcon from '@material-ui/icons/Done'
 import DoneAllIcon from '@material-ui/icons/DoneAll'
@@ -54,11 +56,15 @@ function Row(props) {
         { label: 'Przeniesiony do gry', color: '#33691e', icon: <DoneAllIcon /> }
     ]
 
+    useEffect(() => {
+        setOpen(false);
+    }, [props.update])
+
     return (
         <>
             <TableRow className={classes.root}>
                 <TableCell>
-                    <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
+                    <IconButton aria-label="expand row" size="small" onClick={() => { setOpen(!open) }}>
                         {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                     </IconButton>
                 </TableCell>
@@ -130,11 +136,12 @@ function Row(props) {
     );
 }
 
-export default function Quests(props) {
+export default (props) => {
 
     const [open, setOpen] = useState(false);
     const [openConfirmation, setOpenConfirmation] = useState(false);
 
+    const [update, setUpdate] = useState(false);
     const [edit, setEdit] = useState(false);
     const [quest, setQuest] = useState(false);
     const [form, setForm] = useState({ name: "", location: "", skin: "", occupation: "" })
@@ -172,6 +179,7 @@ export default function Quests(props) {
     }
     const handleCloseEditor = () => {
         setOpenEditor(false);
+        setUpdate(!update);
     }
 
     const handleClickOpenConfirmation = () => {
@@ -190,6 +198,7 @@ export default function Quests(props) {
         props.db.collection("characters").doc(characterId).delete()
             .then(() => {
                 setSnack({ open: true, severity: "success", text: "Postać została usunięta!" });
+                setCharacterId("");
             })
             .catch(error => {
                 setSnack({ open: true, severity: "error", text: `Błąd: ${error}` });
@@ -203,6 +212,7 @@ export default function Quests(props) {
             })
                 .then(() => {
                     setSnack({ open: true, severity: "success", text: "Dodano zadanie do wybranej postaci!" });
+                    setUpdate(!update);
                 })
                 .catch(error => {
                     setSnack({ open: true, severity: "error", text: `Błąd: ${error}` });
@@ -216,6 +226,7 @@ export default function Quests(props) {
             });
         }
     }
+
     const handleSubmit = async () => {
         if (form.name && form.location) {
             if (!edit) {
@@ -261,7 +272,7 @@ export default function Quests(props) {
 
     const charactersRef = props.db.collection('characters');
     const query = charactersRef.orderBy('name');
-    const [characters] = useCollectionData(query, { idField: 'id' })
+    const [characters, loading] = useCollectionData(query, { idField: 'id' });
 
     useEffect(() => {
         characters && characters.forEach(char => {
@@ -280,8 +291,7 @@ export default function Quests(props) {
                     setSnack({ open: true, severity: "error", text: `Błąd: ${error}` });
                 });
         });
-    }, [characters])
-
+    }, [characters, update])
 
     useEffect(() => {
         if (characters && characterId != "" && edit) {
@@ -305,7 +315,12 @@ export default function Quests(props) {
                     </TableHead>
                     <TableBody>
                         {characters && characters.map(row => (
-                            <Row key={row.id} row={row} handleClickOpen={handleClickOpen} handleClickOpenEditor={handleClickOpenEditor} />
+                            <Row
+                                key={row.id}
+                                row={row}
+                                handleClickOpen={handleClickOpen}
+                                handleClickOpenEditor={handleClickOpenEditor}
+                                update={update} />
                         ))}
                     </TableBody>
                 </Table>
@@ -384,7 +399,14 @@ export default function Quests(props) {
                 </DialogActions>
             </Dialog>
 
-            <QuestEditor open={openEditor} handleClose={handleCloseEditor} characters={characters} characterId={characterId} questId={questId} db={props.db} />
+            <QuestEditor
+                open={openEditor}
+                handleClose={handleCloseEditor}
+                characters={characters}
+                characterId={characterId}
+                questId={questId}
+                db={props.db}
+            />
 
             <Confirmation
                 actionText="Usuń"
@@ -395,6 +417,10 @@ export default function Quests(props) {
             />
 
             <Snackalert snack={snack} handleClose={handleCloseSnackbar} />
+
+            <Backdrop open={loading}>
+                <CircularProgress color="inherit" />
+            </Backdrop>
         </>
     );
 }

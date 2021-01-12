@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
+import Snackalert from '../components/Snackalert'
 
 import { version } from '../../package.json'
 import { useDocumentDataOnce } from 'react-firebase-hooks/firestore'
@@ -10,12 +11,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import CardContent from '@material-ui/core/CardContent'
 import CardActions from '@material-ui/core/CardActions'
 import Button from '@material-ui/core/Button'
-import Snackbar from '@material-ui/core/Snackbar'
-import MuiAlert from '@material-ui/lab/Alert'
 
-function Alert(props) {
-    return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
 
 const useStyles = makeStyles(theme => ({
     card: {
@@ -120,9 +116,7 @@ export default function Dashboard(props) {
 
             </Grid>
 
-            <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
-                <Alert onClose={handleClose} severity="warning">Ta funkcja jest jeszcze w trakcie przygotowywania!</Alert>
-            </Snackbar>
+            <Snackalert handleClose={handleClose} snack={{ open: open, text: "Ta funkcja jest jeszcze w trakcie przygotowywania!", severity: "warning" }} />
         </>
     )
 }

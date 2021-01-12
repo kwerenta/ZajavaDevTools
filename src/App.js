@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import './App.css'
 import Navigation from './components/Navigation'
-import Dashboard from './components/Dashboard'
-import Quests from './components/Quests'
-import Items from './components/Items'
+import Dashboard from './pages/Dashboard'
+import Quests from './pages/Quests'
+import Items from './pages/Items'
 
 import firebase from 'firebase/app'
 import 'firebase/auth'
@@ -52,7 +52,6 @@ function App() {
 
   const [user] = useAuthState(auth);
   const [screen, setScreen] = useState("Pulpit");
-  console.log(user);
   function activeScreen() {
     switch (screen) {
       case "Pulpit":
@@ -62,7 +61,7 @@ function App() {
       case "Przedmioty":
         return <Items />
       default:
-        return "Błąd!"
+        return "Błąd krytyczny!"
     }
   }
 
