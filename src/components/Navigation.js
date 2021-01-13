@@ -1,29 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
+import { Link } from 'react-router-dom/cjs/react-router-dom.min'
+import { auth } from '../firebaseApp'
+import Snackalert from './Snackalert'
 
-import { makeStyles } from '@material-ui/core/styles';
-import Drawer from '@material-ui/core/Drawer';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Button from '@material-ui/core/Button';
-import List from '@material-ui/core/List';
-import Divider from '@material-ui/core/Divider';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import IconButton from '@material-ui/core/IconButton';
-import Typography from '@material-ui/core/Typography';
-import Snackbar from '@material-ui/core/Snackbar';
-import MuiAlert from '@material-ui/lab/Alert'
 
-import MenuIcon from '@material-ui/icons/Menu';
-import HomeIcon from '@material-ui/icons/Home';
-import QuestionAnswerIcon from '@material-ui/icons/QuestionAnswer';
-import EditIcon from '@material-ui/icons/Edit';
-import InfoIcon from '@material-ui/icons/Info';
+import { makeStyles } from '@material-ui/core/styles'
+import Drawer from '@material-ui/core/Drawer'
+import AppBar from '@material-ui/core/AppBar'
+import Toolbar from '@material-ui/core/Toolbar'
+import Button from '@material-ui/core/Button'
+import List from '@material-ui/core/List'
+import Divider from '@material-ui/core/Divider'
+import ListItem from '@material-ui/core/ListItem'
+import ListItemIcon from '@material-ui/core/ListItemIcon'
+import ListItemText from '@material-ui/core/ListItemText'
+import IconButton from '@material-ui/core/IconButton'
+import Typography from '@material-ui/core/Typography'
 
-function Alert(props) {
-    return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
+import MenuIcon from '@material-ui/icons/Menu'
+import HomeIcon from '@material-ui/icons/Home'
+import QuestionAnswerIcon from '@material-ui/icons/QuestionAnswer'
+import EditIcon from '@material-ui/icons/Edit'
 
 const useStyles = makeStyles({
     root: {
@@ -55,12 +52,36 @@ export default function Navigation(props) {
         setOpen(true);
     }
 
+    const handleLogout = () => {
+        auth.signOut();
+        props.setNavbar(false);
+    };
+
     const toggleDrawer = (open) => (event) => {
         if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
             return;
         }
         setIsOpened(open);
     };
+
+    const listItems = [
+        {
+            text: "Pulpit",
+            to: "/",
+            icon: <HomeIcon />
+        },
+        {
+            text: "Zadania",
+            to: "/quests",
+            icon: <QuestionAnswerIcon />
+        },
+        // {
+        //     text: "Przedmioty",
+        //     to: "/items",
+        //     icon: <EditIcon />
+        // }
+
+    ]
 
     const list = () => (
         <div
@@ -70,18 +91,18 @@ export default function Navigation(props) {
             onKeyDown={toggleDrawer(false)}
         >
             <List>
-                {['Pulpit', 'Zadania', 'Przedmioty'].map((text, index) => (
-                    <ListItem button key={text} onClick={() => { index != 2 ? props.setScreen(text) : handleClick() }}>
-                        <ListItemIcon>{index == 0 ? <HomeIcon /> : index == 1 ? <QuestionAnswerIcon /> : <EditIcon />}</ListItemIcon>
+                {listItems.map(({ text, to, icon }) => (
+                    <ListItem button component={Link} to={to} key={text}>
+                        <ListItemIcon>{icon}</ListItemIcon>
                         <ListItemText primary={text} />
                     </ListItem>
                 ))}
             </List>
             <Divider />
             <List>
-                {['WIP'].map((text) => (
+                {['Przedmioty'].map((text) => (
                     <ListItem button key={text} onClick={handleClick}>
-                        <ListItemIcon><InfoIcon /></ListItemIcon>
+                        <ListItemIcon><EditIcon /></ListItemIcon>
                         <ListItemText primary={text} />
                     </ListItem>
                 ))}
@@ -97,18 +118,17 @@ export default function Navigation(props) {
                         <MenuIcon />
                     </IconButton>
                     <Typography variant="h6" className={classes.title}>
-                        <Button onClick={() => props.setScreen("Pulpit")}>ZajavaDevTools 😎</Button>
+                        <Button component={Link} to="/">ZajavaDevTools 😎</Button>
                     </Typography>
-                    <Button color="inherit" onClick={props.logOut}>Wyloguj się</Button>
+                    <Button color="inherit" onClick={handleLogout}>Wyloguj się</Button>
                 </Toolbar>
             </AppBar>
             <Drawer open={isOpened} onClose={toggleDrawer(false)}>
                 {list()}
             </Drawer>
 
-            <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
-                <Alert onClose={handleClose} severity="warning">Potrzebujesz czegoś? Zgłoś to w wiadomości prywatnej</Alert>
-            </Snackbar>
-        </div>
+            <Snackalert snack={{ open: open, severity: "warning", text: "Potrzebujesz czegoś? Zgłoś to w wiadomości prywatnej." }} handleClose={handleClose} />
+
+        </div >
     );
 }

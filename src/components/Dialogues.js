@@ -2,7 +2,9 @@ import React, { useState, useRef, useEffect } from 'react'
 import Confirmation from './Confirmation'
 import Snackalert from './Snackalert'
 
+import { db } from '../firebaseApp'
 import { useCollectionData } from 'react-firebase-hooks/firestore'
+
 import { makeStyles } from '@material-ui/core/styles'
 import clsx from 'clsx'
 import Paper from '@material-ui/core/Paper'
@@ -127,15 +129,15 @@ const Message = (props) => {
 const Chat = (props) => {
     const classes = useStyles();
 
-    const dialoguesRef = props.character && props.quest && props.db.collection(`/characters/${props.character.id}/quests/${props.quest.id}/dialogues`);
+    const dialoguesRef = props.character && props.quest && db.collection(`/characters/${props.character.id}/quests/${props.quest.id}/dialogues`);
     const query = dialoguesRef && dialoguesRef.orderBy('order');
     const [dialogues] = useCollectionData(query, { idField: 'id' });
 
     const dummy = useRef();
 
     const status = props.quest && props.quest.status;
-    const isCompleted = status && status > 0;
-    const isInGame = status && status == 2;
+    const isCompleted = status && status > 0 ? true : false;
+    const isInGame = status && status == 2 ? true : false;
 
     const [form, setForm] = useState({ sender: "", text: "", name: props.quest && props.quest.name });
     const [messageId, setMessageId] = useState("");
@@ -219,11 +221,11 @@ const Chat = (props) => {
     }
     const deleteMessage = () => {
         handleCloseConfirmation();
-        props.db.doc(`/characters/${props.character.id}/quests/${props.quest.id}/dialogues/${messageId}`).delete();
+        db.doc(`/characters/${props.character.id}/quests/${props.quest.id}/dialogues/${messageId}`).delete();
     }
     useEffect(() => {
         if (form.name) {
-            props.db.collection('characters')
+            db.collection('characters')
                 .doc(props.character.id)
                 .collection('quests')
                 .doc(props.quest.id)

@@ -3,6 +3,8 @@ import Dialogues from './Dialogues'
 import Confirmation from './Confirmation'
 import Snackalert from './Snackalert'
 
+import { db } from '../firebaseApp'
+
 import { makeStyles } from '@material-ui/core/styles'
 import Dialog from '@material-ui/core/Dialog'
 import AppBar from '@material-ui/core/AppBar'
@@ -45,7 +47,7 @@ export default function QuestEditor(props) {
     const deleteQuest = () => {
         props.handleClose();
         handleCloseConfirmation();
-        props.db.doc(`/characters/${props.characterId}/quests/${props.questId}`).delete()
+        db.doc(`/characters/${props.characterId}/quests/${props.questId}`).delete()
             .then(() => {
                 setSnack({ open: true, severity: "success", text: "Zadanie zostało usunięte!" });
             })
@@ -68,7 +70,7 @@ export default function QuestEditor(props) {
                         <Button color="secondary" disabled={quest && quest.status > 0} onClick={() => setOpen(true)}>Usuń zadanie</Button>
                     </Toolbar>
                 </AppBar>
-                <Dialogues character={character} quest={quest} db={props.db} />
+                <Dialogues character={character} quest={quest} />
 
             </Dialog>
 

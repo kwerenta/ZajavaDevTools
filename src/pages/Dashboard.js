@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import Snackalert from '../components/Snackalert'
 
+import { UserContext } from '../User'
 import { version } from '../../package.json'
-import { useDocumentDataOnce } from 'react-firebase-hooks/firestore'
 
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
@@ -34,13 +34,12 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-export default function Dashboard(props) {
+export default function Dashboard() {
     const classes = useStyles();
 
-    const [open, setOpen] = useState(false);
+    const { currentUser, userData } = useContext(UserContext);
 
-    const usersRef = props.db.collection('users').doc(props.user.uid);
-    const [user] = useDocumentDataOnce(usersRef, { idField: 'id' });
+    const [open, setOpen] = useState(false);
 
     function handleClick() {
         setOpen(true);
@@ -64,10 +63,10 @@ export default function Dashboard(props) {
                     <Card className={classes.card} variant="outlined">
                         <CardContent>
                             <Typography variant="h4" component="h2">
-                                Witaj, {props.user.displayName}!
-                    </Typography>
+                                Witaj, {currentUser.displayName}!
+                            </Typography>
                             <Typography variant="body2" component="p">
-                                Twoje ranga to: {user && user.rank}
+                                Twoje ranga to: {userData && userData.rank}
                             </Typography>
                         </CardContent>
                     </Card>

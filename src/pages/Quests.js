@@ -3,6 +3,9 @@ import QuestEditor from '../components/QuestEditor'
 import Confirmation from '../components/Confirmation'
 import Snackalert from '../components/Snackalert'
 
+import { db } from '../firebaseApp'
+import { useCollectionData } from 'react-firebase-hooks/firestore'
+
 import { makeStyles } from '@material-ui/core/styles'
 import Box from '@material-ui/core/Box'
 import Collapse from '@material-ui/core/Collapse'
@@ -35,8 +38,6 @@ import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
 import EditIcon from '@material-ui/icons/Edit'
 import AddIcon from '@material-ui/icons/Add'
 import DeleteIcon from '@material-ui/icons/Delete'
-
-import { useCollectionData } from 'react-firebase-hooks/firestore'
 
 const useRowStyles = makeStyles({
     root: {
@@ -195,7 +196,7 @@ export default (props) => {
     const deleteCharacter = () => {
         handleCloseConfirmation();
         handleClose();
-        props.db.collection("characters").doc(characterId).delete()
+        db.collection("characters").doc(characterId).delete()
             .then(() => {
                 setSnack({ open: true, severity: "success", text: "Postać została usunięta!" });
                 setCharacterId("");
@@ -206,7 +207,7 @@ export default (props) => {
     }
     const addQuest = async () => {
         if (form.name) {
-            await props.db.collection('characters').doc(characterId).collection('quests').add({
+            await db.collection('characters').doc(characterId).collection('quests').add({
                 name: form.name,
                 status: 0
             })
@@ -270,14 +271,14 @@ export default (props) => {
         }
     }
 
-    const charactersRef = props.db.collection('characters');
+    const charactersRef = db.collection('characters');
     const query = charactersRef.orderBy('name');
     const [characters, loading] = useCollectionData(query, { idField: 'id' });
 
     useEffect(() => {
         characters && characters.forEach(char => {
             char.quests = [];
-            props.db.collection('characters').doc(char.id).collection('quests').get()
+            db.collection('characters').doc(char.id).collection('quests').get()
                 .then(response => {
                     response.forEach(document => {
                         const quest = {
@@ -405,7 +406,6 @@ export default (props) => {
                 characters={characters}
                 characterId={characterId}
                 questId={questId}
-                db={props.db}
             />
 
             <Confirmation
