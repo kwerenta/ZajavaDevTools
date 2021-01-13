@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom/cjs/react-router-dom.min'
 import { auth } from '../firebaseApp'
 import Snackalert from './Snackalert'
 
-
 import { makeStyles } from '@material-ui/core/styles'
 import Drawer from '@material-ui/core/Drawer'
 import AppBar from '@material-ui/core/AppBar'

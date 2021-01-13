@@ -1,7 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useContext } from 'react'
 import Confirmation from './Confirmation'
 import Snackalert from './Snackalert'
 
+import { UserContext } from '../User'
 import { db } from '../firebaseApp'
 import { useCollectionData } from 'react-firebase-hooks/firestore'
 
@@ -133,6 +134,8 @@ const Chat = (props) => {
     const query = dialoguesRef && dialoguesRef.orderBy('order');
     const [dialogues] = useCollectionData(query, { idField: 'id' });
 
+    const { userData } = useContext(UserContext);
+
     const dummy = useRef();
 
     const status = props.quest && props.quest.status;
@@ -159,7 +162,7 @@ const Chat = (props) => {
     useEffect(() => {
         if (dialogues && messageId != "" && edit) {
             const dialogue = dialogues.find(dialogue => dialogue.id === messageId);
-            setForm({ sender: dialogue.sender, text: dialogue.text, order: dialogue.order });
+            setForm({ ...form, sender: dialogue.sender, text: dialogue.text, order: dialogue.order });
         }
     }, [messageId]);
 
@@ -208,7 +211,7 @@ const Chat = (props) => {
                     sender: form.sender,
                 })
                 .then(() => {
-                    setForm({ sender: "", text: "" });
+                    setForm({ ...form, sender: "", text: "" });
                     setEdit(false);
                     setMessageId('');
                 })
@@ -288,27 +291,28 @@ const Chat = (props) => {
                                 />
                             </Tooltip>
                         </ListItem>
-                        <ListItem key="ingame">
-                            <ListItemIcon>
-                                <DoneAllIcon />
-                            </ListItemIcon>
-                            <Tooltip title="Zmienia stan ukończenia prac nad zadaniem" arrow>
-                                <FormControlLabel
-                                    control={
-                                        <Switch
-                                            disabled={!questStatus.completed}
-                                            checked={questStatus.ingame}
-                                            onChange={handleChange}
-                                            name="ingame"
-                                            color="primary"
-                                        />
-                                    }
-                                    label="Przeniesiono do gry"
-                                    labelPlacement="start"
-                                    style={{ margin: 0 }}
-                                />
-                            </Tooltip>
-                        </ListItem>
+                        {userData.rank == "administrator" &&
+                            (<ListItem key="ingame">
+                                <ListItemIcon>
+                                    <DoneAllIcon />
+                                </ListItemIcon>
+                                <Tooltip title="Zmienia stan ukończenia prac nad zadaniem" arrow>
+                                    <FormControlLabel
+                                        control={
+                                            <Switch
+                                                disabled={!questStatus.completed}
+                                                checked={questStatus.ingame}
+                                                onChange={handleChange}
+                                                name="ingame"
+                                                color="primary"
+                                            />
+                                        }
+                                        label="Przeniesiono do gry"
+                                        labelPlacement="start"
+                                        style={{ margin: 0 }}
+                                    />
+                                </Tooltip>
+                            </ListItem>)}
                         <ListItem button disabled key="requirements">
                             <ListItemIcon>
                                 <EditIcon />
