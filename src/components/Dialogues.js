@@ -231,6 +231,8 @@ const Chat = props => {
                 ...questStatus,
                 [e.target.name]: e.target.checked,
             });
+            setForm({ ...form, sender: "", text: "" });
+            setEdit(false);
         } else {
             setForm({ ...form, [e.target.name]: e.target.value });
         }
