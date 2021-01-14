@@ -1,71 +1,83 @@
-import React, { useEffect, useState } from 'react'
-import QuestEditor from '../components/QuestEditor'
-import Confirmation from '../components/Confirmation'
-import Snackalert from '../components/Snackalert'
+import React, { useEffect, useState } from "react";
+import QuestEditor from "../components/QuestEditor";
+import Confirmation from "../components/Confirmation";
+import Snackalert from "../components/Snackalert";
 
-import { db } from '../firebaseApp'
-import { useCollectionData } from 'react-firebase-hooks/firestore'
+import { db } from "../firebaseApp";
+import { useCollectionData } from "react-firebase-hooks/firestore";
 
-import { makeStyles } from '@material-ui/core/styles'
-import Box from '@material-ui/core/Box'
-import Collapse from '@material-ui/core/Collapse'
-import IconButton from '@material-ui/core/IconButton'
-import Table from '@material-ui/core/Table'
-import TableBody from '@material-ui/core/TableBody'
-import TableCell from '@material-ui/core/TableCell'
-import TableContainer from '@material-ui/core/TableContainer'
-import TableHead from '@material-ui/core/TableHead'
-import TableRow from '@material-ui/core/TableRow'
-import Typography from '@material-ui/core/Typography'
-import Paper from '@material-ui/core/Paper'
-import Fab from '@material-ui/core/Fab'
-import Button from '@material-ui/core/Button'
-import Dialog from '@material-ui/core/Dialog'
-import TextField from '@material-ui/core/TextField'
-import DialogTitle from '@material-ui/core/DialogTitle'
-import DialogContent from '@material-ui/core/DialogContent'
-import DialogActions from '@material-ui/core/DialogActions'
-import DialogContentText from '@material-ui/core/DialogContentText'
-import Chip from '@material-ui/core/Chip'
-import Backdrop from '@material-ui/core/Backdrop'
-import CircularProgress from '@material-ui/core/CircularProgress'
+import { makeStyles } from "@material-ui/core/styles";
+import Box from "@material-ui/core/Box";
+import Collapse from "@material-ui/core/Collapse";
+import IconButton from "@material-ui/core/IconButton";
+import Table from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import TableCell from "@material-ui/core/TableCell";
+import TableContainer from "@material-ui/core/TableContainer";
+import TableHead from "@material-ui/core/TableHead";
+import TableRow from "@material-ui/core/TableRow";
+import Typography from "@material-ui/core/Typography";
+import Paper from "@material-ui/core/Paper";
+import Fab from "@material-ui/core/Fab";
+import Button from "@material-ui/core/Button";
+import Dialog from "@material-ui/core/Dialog";
+import TextField from "@material-ui/core/TextField";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import Chip from "@material-ui/core/Chip";
+import Backdrop from "@material-ui/core/Backdrop";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
-import DoneIcon from '@material-ui/icons/Done'
-import DoneAllIcon from '@material-ui/icons/DoneAll'
-import MessageIcon from '@material-ui/icons/Message'
-import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
-import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
-import EditIcon from '@material-ui/icons/Edit'
-import AddIcon from '@material-ui/icons/Add'
-import DeleteIcon from '@material-ui/icons/Delete'
+import DoneIcon from "@material-ui/icons/Done";
+import DoneAllIcon from "@material-ui/icons/DoneAll";
+import MessageIcon from "@material-ui/icons/Message";
+import KeyboardArrowDownIcon from "@material-ui/icons/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
+import EditIcon from "@material-ui/icons/Edit";
+import AddIcon from "@material-ui/icons/Add";
+import DeleteIcon from "@material-ui/icons/Delete";
 
 const useRowStyles = makeStyles({
     root: {
-        '& > *': {
-            borderBottom: 'unset',
+        "& > *": {
+            borderBottom: "unset",
         },
     },
 });
 
 function Row(props) {
     const { row } = props;
+
     const [open, setOpen] = useState(false);
+
     const classes = useRowStyles();
     const statusChips = [
-        { label: 'W trakcie pisania', color: '#00695c', icon: <MessageIcon /> },
-        { label: 'Ukończony', color: '#2e7d32', icon: <DoneIcon /> },
-        { label: 'Przeniesiony do gry', color: '#33691e', icon: <DoneAllIcon /> }
-    ]
+        { label: "W trakcie pisania", color: "#00695c", icon: <MessageIcon /> },
+        { label: "Ukończony", color: "#2e7d32", icon: <DoneIcon /> },
+        {
+            label: "Przeniesiony do gry",
+            color: "#33691e",
+            icon: <DoneAllIcon />,
+        },
+    ];
 
     useEffect(() => {
         setOpen(false);
-    }, [props.update])
+    }, [props.update]);
 
     return (
         <>
             <TableRow className={classes.root}>
                 <TableCell>
-                    <IconButton aria-label="expand row" size="small" onClick={() => { setOpen(!open) }}>
+                    <IconButton
+                        aria-label="expand row"
+                        size="small"
+                        onClick={() => {
+                            setOpen(!open);
+                        }}
+                    >
                         {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                     </IconButton>
                 </TableCell>
@@ -75,7 +87,13 @@ function Row(props) {
                 <TableCell>{row.location}</TableCell>
                 <TableCell>{row.occupation}</TableCell>
                 <TableCell>
-                    <IconButton aria-label="open character editor" size="small" onClick={() => { props.handleClickOpen(true, false, row.id); }}>
+                    <IconButton
+                        aria-label="open-character-editor"
+                        size="small"
+                        onClick={() => {
+                            props.handleClickOpen(true, false, row.id);
+                        }}
+                    >
                         <EditIcon />
                     </IconButton>
                 </TableCell>
@@ -96,33 +114,45 @@ function Row(props) {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {row.quests && row.quests.map((quest) => (
-                                        <TableRow key={quest.name}>
-                                            <TableCell>
-                                                {quest.name}
-                                            </TableCell>
-                                            <TableCell>
-                                                {!isNaN(quest.status) &&
-                                                    <Chip
-                                                        style={{ backgroundColor: statusChips[quest.status].color }}
-                                                        icon={statusChips[quest.status].icon}
-                                                        label={statusChips[quest.status].label}
-                                                    />}
-                                            </TableCell>
-                                            <TableCell>
-                                                <IconButton aria-label="open quest editor" size="small" onClick={() => { props.handleClickOpenEditor(row.id, quest.id) }}>
-                                                    <EditIcon />
-                                                </IconButton>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
+                                    {row.quests &&
+                                        row.quests.map(quest => (
+                                            <TableRow key={quest.name}>
+                                                <TableCell>{quest.name}</TableCell>
+                                                <TableCell>
+                                                    {!isNaN(quest.status) && (
+                                                        <Chip
+                                                            style={{
+                                                                backgroundColor: statusChips[quest.status].color,
+                                                            }}
+                                                            icon={statusChips[quest.status].icon}
+                                                            label={statusChips[quest.status].label}
+                                                        />
+                                                    )}
+                                                </TableCell>
+                                                <TableCell>
+                                                    <IconButton
+                                                        aria-label="open quest editor"
+                                                        size="small"
+                                                        onClick={() => {
+                                                            props.handleClickOpenEditor(row.id, quest.id);
+                                                        }}
+                                                    >
+                                                        <EditIcon />
+                                                    </IconButton>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
                                     <TableRow key={`DodajQuesta${row.id}`}>
-                                        <TableCell>
-                                            Dodaj zadanie
-                                        </TableCell>
+                                        <TableCell>Utwórz zadanie</TableCell>
                                         <TableCell />
                                         <TableCell>
-                                            <IconButton aria-label="add quest" size="small" onClick={() => { props.handleClickOpen(false, true, row.id); }}>
+                                            <IconButton
+                                                aria-label="add quest"
+                                                size="small"
+                                                onClick={() => {
+                                                    props.handleClickOpen(false, true, row.id);
+                                                }}
+                                            >
                                                 <AddIcon />
                                             </IconButton>
                                         </TableCell>
@@ -137,29 +167,40 @@ function Row(props) {
     );
 }
 
-export default (props) => {
-
+export default props => {
     const [open, setOpen] = useState(false);
     const [openConfirmation, setOpenConfirmation] = useState(false);
 
     const [update, setUpdate] = useState(false);
     const [edit, setEdit] = useState(false);
     const [quest, setQuest] = useState(false);
-    const [form, setForm] = useState({ name: "", location: "", skin: "", occupation: "" })
-    const [formError, setFormError] = useState({ name: false, location: false });
+    const [form, setForm] = useState({
+        name: "",
+        location: "",
+        skin: "",
+        occupation: "",
+    });
+    const [formError, setFormError] = useState({
+        name: false,
+        location: false,
+    });
     const [characterId, setCharacterId] = useState("");
     const [questId, setQuestId] = useState("");
-    const [snack, setSnack] = useState({ open: false, severity: "success", text: "Postać została utworzona!" });
+    const [snack, setSnack] = useState({
+        open: false,
+        severity: "success",
+        text: "Postać została utworzona!",
+    });
     const [openEditor, setOpenEditor] = useState(false);
 
-    const handleChange = (e) => {
+    const handleChange = e => {
         setForm({ ...form, [e.target.name]: e.target.value });
-        if (['name', 'location'].includes(e.target.name)) {
-            e.target.value == "" ?
-                setFormError({ ...formError, [e.target.name]: true }) :
-                setFormError({ ...formError, [e.target.name]: false })
+        if (["name", "location"].includes(e.target.name)) {
+            e.target.value == ""
+                ? setFormError({ ...formError, [e.target.name]: true })
+                : setFormError({ ...formError, [e.target.name]: false });
         }
-    }
+    };
 
     const handleClickOpen = (edit, quest, id) => {
         setOpen(true);
@@ -177,127 +218,185 @@ export default (props) => {
         setCharacterId(charId);
         setQuestId(questId);
         setOpenEditor(true);
-    }
+    };
     const handleCloseEditor = () => {
         setOpenEditor(false);
         setUpdate(!update);
-    }
+    };
 
     const handleClickOpenConfirmation = () => {
         setOpenConfirmation(true);
-    }
+    };
     const handleCloseConfirmation = () => {
         setOpenConfirmation(false);
     };
 
     const handleCloseSnackbar = () => {
         setSnack({ ...snack, open: false });
-    }
+    };
     const deleteCharacter = () => {
         handleCloseConfirmation();
         handleClose();
-        db.collection("characters").doc(characterId).delete()
+        db.collection("characters")
+            .doc(characterId)
+            .delete()
             .then(() => {
-                setSnack({ open: true, severity: "success", text: "Postać została usunięta!" });
+                setSnack({
+                    open: true,
+                    severity: "success",
+                    text: "Postać została usunięta!",
+                });
                 setCharacterId("");
             })
             .catch(error => {
-                setSnack({ open: true, severity: "error", text: `Błąd: ${error}` });
+                setSnack({
+                    open: true,
+                    severity: "error",
+                    text: `Błąd: ${error}`,
+                });
             });
-    }
+    };
     const addQuest = async () => {
         if (form.name) {
-            await db.collection('characters').doc(characterId).collection('quests').add({
-                name: form.name,
-                status: 0
-            })
+            await db
+                .collection("characters")
+                .doc(characterId)
+                .collection("quests")
+                .add({
+                    name: form.name,
+                    status: 0,
+                })
                 .then(() => {
-                    setSnack({ open: true, severity: "success", text: "Dodano zadanie do wybranej postaci!" });
+                    setSnack({
+                        open: true,
+                        severity: "success",
+                        text: "Dodano zadanie do wybranej postaci!",
+                    });
                     setUpdate(!update);
                 })
                 .catch(error => {
-                    setSnack({ open: true, severity: "error", text: `Błąd: ${error}` });
+                    setSnack({
+                        open: true,
+                        severity: "error",
+                        text: `Błąd: ${error}`,
+                    });
                 });
             handleClose();
-        }
-        else {
-            setSnack({ open: true, severity: "error", text: `Pola nazwa musi być wypełnione!` });
+        } else {
+            setSnack({
+                open: true,
+                severity: "error",
+                text: `Pola nazwa musi być wypełnione!`,
+            });
             setFormError({
-                name: form.name == "" ? true : false
+                name: form.name == "" ? true : false,
             });
         }
-    }
+    };
 
     const handleSubmit = async () => {
         if (form.name && form.location) {
             if (!edit) {
-                await charactersRef.add({
-                    name: form.name,
-                    location: form.location,
-                    occupation: form.occupation,
-                    skin: form.skin,
-                    createdBy: props.user.uid
-                })
+                await charactersRef
+                    .add({
+                        name: form.name,
+                        location: form.location,
+                        occupation: form.occupation,
+                        skin: form.skin,
+                        createdBy: props.user.uid,
+                    })
                     .then(() => {
-                        setSnack({ open: true, severity: "success", text: "Postać została utworzona!" });
+                        setSnack({
+                            open: true,
+                            severity: "success",
+                            text: "Postać została utworzona!",
+                        });
                     })
                     .catch(error => {
-                        setSnack({ open: true, severity: "error", text: `Błąd: ${error}` });
+                        setSnack({
+                            open: true,
+                            severity: "error",
+                            text: `Błąd: ${error}`,
+                        });
                     });
-            }
-            else {
-                charactersRef.doc(characterId)
+            } else {
+                charactersRef
+                    .doc(characterId)
                     .update({
                         name: form.name,
                         location: form.location,
                         occupation: form.occupation,
-                        skin: form.skin
+                        skin: form.skin,
                     })
                     .then(() => {
-                        setSnack({ open: true, severity: "success", text: "Postać została zedytowana!" });
+                        setSnack({
+                            open: true,
+                            severity: "success",
+                            text: "Postać została zedytowana!",
+                        });
                     })
                     .catch(error => {
-                        setSnack({ open: true, severity: "error", text: `Błąd: ${error}` });
+                        setSnack({
+                            open: true,
+                            severity: "error",
+                            text: `Błąd: ${error}`,
+                        });
                     });
             }
             handleClose();
-        }
-        else {
-            setSnack({ open: true, severity: "error", text: `Pola nazwa i lokalizacja muszą być wypełnione!` });
+        } else {
+            setSnack({
+                open: true,
+                severity: "error",
+                text: `Pola nazwa i lokalizacja muszą być wypełnione!`,
+            });
             setFormError({
                 name: form.name == "" ? true : false,
                 location: form.location == "" ? true : false,
             });
         }
-    }
+    };
 
-    const charactersRef = db.collection('characters');
-    const query = charactersRef.orderBy('name');
-    const [characters, loading] = useCollectionData(query, { idField: 'id' });
+    const charactersRef = db.collection("characters");
+    const query = charactersRef.orderBy("name");
+    const [characters, loading] = useCollectionData(query, { idField: "id" });
 
     useEffect(() => {
-        characters && characters.forEach(char => {
-            char.quests = [];
-            db.collection('characters').doc(char.id).collection('quests').get()
-                .then(response => {
-                    response.forEach(document => {
-                        const quest = {
-                            id: document.id,
-                            ...document.data()
-                        };
-                        char.quests.push(quest);
+        characters &&
+            characters.forEach(char => {
+                char.quests = [];
+                db.collection("characters")
+                    .doc(char.id)
+                    .collection("quests")
+                    .get()
+                    .then(response => {
+                        response.forEach(document => {
+                            const quest = {
+                                id: document.id,
+                                ...document.data(),
+                            };
+                            char.quests.push(quest);
+                        });
+                    })
+                    .catch(error => {
+                        setSnack({
+                            open: true,
+                            severity: "error",
+                            text: `Błąd: ${error}`,
+                        });
                     });
-                })
-                .catch(error => {
-                    setSnack({ open: true, severity: "error", text: `Błąd: ${error}` });
-                });
-        });
-    }, [characters, update])
+            });
+    }, [characters, update]);
 
     useEffect(() => {
         if (characters && characterId != "" && edit) {
             const character = characters.find(character => character.id === characterId);
-            setForm({ name: character.name, location: character.location, occupation: character.occupation, skin: character.skin });
+            setForm({
+                name: character.name,
+                location: character.location,
+                occupation: character.occupation,
+                skin: character.skin,
+            });
         }
     }, [characterId]);
 
@@ -305,7 +404,7 @@ export default (props) => {
         <>
             <TableContainer component={Paper}>
                 <Table aria-label="collapsible table">
-                    <TableHead style={{ backgroundColor: '#000' }}>
+                    <TableHead style={{ backgroundColor: "#000" }}>
                         <TableRow>
                             <TableCell />
                             <TableCell>Nazwa</TableCell>
@@ -315,19 +414,26 @@ export default (props) => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {characters && characters.map(row => (
-                            <Row
-                                key={row.id}
-                                row={row}
-                                handleClickOpen={handleClickOpen}
-                                handleClickOpenEditor={handleClickOpenEditor}
-                                update={update} />
-                        ))}
+                        {characters &&
+                            characters.map(row => (
+                                <Row
+                                    key={row.id}
+                                    row={row}
+                                    handleClickOpen={handleClickOpen}
+                                    handleClickOpenEditor={handleClickOpenEditor}
+                                    update={update}
+                                />
+                            ))}
                     </TableBody>
                 </Table>
             </TableContainer>
 
-            <Fab color="secondary" aria-label="add" style={{ position: 'fixed', top: '90%', left: '85%' }} onClick={() => handleClickOpen(false)}>
+            <Fab
+                color="secondary"
+                aria-label="add"
+                style={{ position: "fixed", top: "90%", left: "85%" }}
+                onClick={() => handleClickOpen(false)}
+            >
                 <AddIcon />
             </Fab>
 
@@ -335,7 +441,11 @@ export default (props) => {
                 <DialogTitle id="form-dialog-title">{quest ? "Kreator zadań" : "Kreator postaci"}</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        {quest ? `Napisz nazwę zadania, które zlecać będzie wybrana przez Ciebie postać` : `Ten jakże zaawansowany kreator postaci pozwala na ${edit ? 'edycję' : 'dodanie'} zleceniodawcy, który będzie dostępny na serwerze ZajvaCraft.`}
+                        {quest
+                            ? `Napisz nazwę zadania, które zlecać będzie wybrana przez Ciebie postać`
+                            : `Ten jakże zaawansowany kreator postaci pozwala na ${
+                                  edit ? "edycję" : "dodanie"
+                              } zleceniodawcy, który będzie dostępny na serwerze ZajvaCraft.`}
                     </DialogContentText>
                     <TextField
                         required
@@ -349,53 +459,56 @@ export default (props) => {
                         value={form.name}
                         onChange={handleChange}
                     />
-                    {!quest && <>
-                        <TextField
-                            required
-                            error={formError.location}
-                            variant="outlined"
-                            margin="dense"
-                            name="location"
-                            label="Lokalizacja"
-                            fullWidth
-                            value={form.location}
-                            onChange={handleChange}
-                        />
-                        <TextField
-                            variant="outlined"
-                            margin="dense"
-                            name="occupation"
-                            label="Zajęcie"
-                            fullWidth
-                            value={form.occupation}
-                            onChange={handleChange}
-                        />
-                        <TextField
-                            variant="outlined"
-                            margin="dense"
-                            name="skin"
-                            label="Skin URL"
-                            fullWidth
-                            value={form.skin}
-                            onChange={handleChange}
-                        />
-                    </>}
-
+                    {!quest && (
+                        <>
+                            <TextField
+                                required
+                                error={formError.location}
+                                variant="outlined"
+                                margin="dense"
+                                name="location"
+                                label="Lokalizacja"
+                                fullWidth
+                                value={form.location}
+                                onChange={handleChange}
+                            />
+                            <TextField
+                                variant="outlined"
+                                margin="dense"
+                                name="occupation"
+                                label="Zajęcie"
+                                fullWidth
+                                value={form.occupation}
+                                onChange={handleChange}
+                            />
+                            <TextField
+                                variant="outlined"
+                                margin="dense"
+                                name="skin"
+                                label="Skin URL"
+                                fullWidth
+                                value={form.skin}
+                                onChange={handleChange}
+                            />
+                        </>
+                    )}
                 </DialogContent>
                 <DialogActions>
-                    {edit && <Button
-                        variant="contained"
-                        color="secondary"
-                        startIcon={<DeleteIcon />}
-                        onClick={handleClickOpenConfirmation}
-                    >
-                        Usuń
-                        </Button>}
+                    {edit && (
+                        <Button
+                            variant="contained"
+                            color="secondary"
+                            startIcon={<DeleteIcon />}
+                            onClick={handleClickOpenConfirmation}
+                        >
+                            Usuń
+                        </Button>
+                    )}
                     <Button onClick={handleClose} color="primary">
                         Anuluj
-                        </Button>
+                    </Button>
                     <Button onClick={quest ? addQuest : handleSubmit} variant="contained" color="primary">
-                        {edit ? 'Edytuj' : 'Utwórz'}
+                        {edit ? "Edytuj" : "Utwórz"}
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -423,4 +536,4 @@ export default (props) => {
             </Backdrop>
         </>
     );
-}
+};
