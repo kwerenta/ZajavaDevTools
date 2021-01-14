@@ -1,5 +1,6 @@
 import React, { useState, useContext } from "react";
 import Snackalert from "../components/Snackalert";
+import Changelog from "../components/Changelog";
 
 import { UserContext } from "../User";
 import { version } from "../../package.json";
@@ -39,14 +40,21 @@ export default function Dashboard() {
     const { currentUser, userData } = useContext(UserContext);
 
     const [open, setOpen] = useState(false);
+    const [openChangelog, setOpenChangelog] = useState(false);
 
-    function handleClick() {
+    const handleOpenChangelog = () => {
+        setOpenChangelog(true);
+    };
+    const handleCloseChangelog = () => {
+        setOpenChangelog(false);
+    };
+    const handleClick = () => {
         setOpen(true);
-    }
+    };
 
-    function handleClose() {
+    const handleClose = () => {
         setOpen(false);
-    }
+    };
 
     return (
         <>
@@ -82,7 +90,7 @@ export default function Dashboard() {
                             </Typography>
                         </CardContent>
                         <CardActions>
-                            <Button size="small" onClick={handleClick}>
+                            <Button size="small" onClick={handleOpenChangelog}>
                                 Zobacz listę zmian
                             </Button>
                         </CardActions>
@@ -113,6 +121,8 @@ export default function Dashboard() {
                     </Card>
                 </Grid>
             </Grid>
+
+            <Changelog open={openChangelog} handleClose={handleCloseChangelog} />
 
             <Snackalert
                 handleClose={handleClose}
