@@ -29,7 +29,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export default function QuestEditor(props) {
+const QuestEditor = props => {
     const classes = useStyles();
     const character = props.characters && props.characters.find(character => character.id === props.characterId);
     const quest = character && character.quests && character.quests.find(quest => quest.id === props.questId);
@@ -94,4 +94,5 @@ export default function QuestEditor(props) {
             <Snackalert snack={snack} handleClose={handleCloseSnackbar} />
         </>
     );
-}
+};
+export default QuestEditor;

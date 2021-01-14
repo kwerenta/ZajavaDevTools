@@ -6,7 +6,7 @@ const Alert = props => {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
 };
 
-export default props => {
+const Snackalert = props => {
     return (
         <Snackbar open={props.snack.open} autoHideDuration={6000} onClose={props.handleClose}>
             <Alert onClose={props.handleClose} severity={props.snack.severity}>
@@ -15,3 +15,5 @@ export default props => {
         </Snackbar>
     );
 };
+
+export default Snackalert;

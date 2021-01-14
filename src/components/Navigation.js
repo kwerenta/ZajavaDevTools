@@ -39,7 +39,7 @@ const useStyles = makeStyles({
     },
 });
 
-export default function Navigation(props) {
+const Navigation = props => {
     const classes = useStyles();
     const [isOpened, setIsOpened] = useState(false);
     const [open, setOpen] = useState(false);
@@ -142,4 +142,6 @@ export default function Navigation(props) {
             />
         </div>
     );
-}
+};
+
+export default Navigation;
