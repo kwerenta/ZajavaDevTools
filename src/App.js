@@ -19,7 +19,7 @@ const theme = createMuiTheme({
         primary: {
             contrastText: "#fff",
             light: "#63ccff",
-            main: "#009be5",
+            main: "#008ad4",
             dark: "#006ca0",
         },
         secondary: {
@@ -30,7 +30,7 @@ const theme = createMuiTheme({
     },
 });
 
-function App() {
+const App = () => {
     const [navbar, setNavbar] = useState(false);
     return (
         <UserProvider>
@@ -53,5 +53,5 @@ function App() {
             </ThemeProvider>
         </UserProvider>
     );
-}
+};
 export default App;
