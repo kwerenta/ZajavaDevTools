@@ -2,7 +2,8 @@
     {
         "version" : "0.2.6", 
         "changes" : [
-            "Dodano okno wyświetlające listę zmian",
+            "Skonfigurowano aplikację jako PWA, zmiana ta umożliwa zainstalowanie aplikacji bezpośrednio z przeglądarki",
+            "Dodano okno zawierające listę zmian, które wyświetla się automatycznie po aktualizacji",
             "Naprawiono \"czyszczenie\" formularza po zmianie statusu zadania",
             "Drobne zmiany w wyglądzie aplikacji, takie jak kolorystyka i responywność",
             "Dodano \"Mówcę\" Etap w edytorze dialogów"

@@ -1,7 +1,8 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import Snackalert from "../components/Snackalert";
 import Changelog from "../components/Changelog";
 
+import { db } from "../firebaseApp";
 import { UserContext } from "../User";
 import { version } from "../../package.json";
 
@@ -39,8 +40,21 @@ const Dashboard = () => {
 
     const { currentUser, userData } = useContext(UserContext);
 
+    const lastVersion = userData && userData.version;
+
+    useEffect(() => {
+        lastVersion && setNewVersion();
+    }, [lastVersion]);
+
     const [open, setOpen] = useState(false);
     const [openChangelog, setOpenChangelog] = useState(false);
+
+    const setNewVersion = () => {
+        lastVersion != version && handleOpenChangelog();
+        db.collection("users").doc(currentUser.uid).update({
+            version: version,
+        });
+    };
 
     const handleOpenChangelog = () => {
         setOpenChangelog(true);
