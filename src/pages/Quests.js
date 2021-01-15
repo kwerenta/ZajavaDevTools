@@ -7,37 +7,37 @@ import { db } from "../firebaseApp";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 
 import { makeStyles } from "@material-ui/core/styles";
+import Backdrop from "@material-ui/core/Backdrop";
 import Box from "@material-ui/core/Box";
+import Button from "@material-ui/core/Button";
+import Chip from "@material-ui/core/Chip";
+import CircularProgress from "@material-ui/core/CircularProgress";
 import Collapse from "@material-ui/core/Collapse";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import Fab from "@material-ui/core/Fab";
 import IconButton from "@material-ui/core/IconButton";
+import Paper from "@material-ui/core/Paper";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
-import Typography from "@material-ui/core/Typography";
-import Paper from "@material-ui/core/Paper";
-import Fab from "@material-ui/core/Fab";
-import Button from "@material-ui/core/Button";
-import Dialog from "@material-ui/core/Dialog";
 import TextField from "@material-ui/core/TextField";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContentText from "@material-ui/core/DialogContentText";
-import Chip from "@material-ui/core/Chip";
-import Backdrop from "@material-ui/core/Backdrop";
-import CircularProgress from "@material-ui/core/CircularProgress";
+import Typography from "@material-ui/core/Typography";
 
-import DoneIcon from "@material-ui/icons/Done";
-import DoneAllIcon from "@material-ui/icons/DoneAll";
-import MessageIcon from "@material-ui/icons/Message";
-import KeyboardArrowDownIcon from "@material-ui/icons/KeyboardArrowDown";
-import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
-import EditIcon from "@material-ui/icons/Edit";
 import AddIcon from "@material-ui/icons/Add";
 import DeleteIcon from "@material-ui/icons/Delete";
+import DoneAllIcon from "@material-ui/icons/DoneAll";
+import DoneIcon from "@material-ui/icons/Done";
+import EditIcon from "@material-ui/icons/Edit";
+import KeyboardArrowDownIcon from "@material-ui/icons/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
+import MessageIcon from "@material-ui/icons/Message";
 
 const useRowStyles = makeStyles({
     root: {
@@ -45,9 +45,13 @@ const useRowStyles = makeStyles({
             borderBottom: "unset",
         },
     },
+    cell: {
+        paddingBottom: 0,
+        paddingTop: 0,
+    },
 });
 
-function Row(props) {
+const Row = props => {
     const { row } = props;
 
     const [open, setOpen] = useState(false);
@@ -55,9 +59,9 @@ function Row(props) {
     const classes = useRowStyles();
     const statusChips = [
         { label: "W trakcie pisania", color: "#00695c", icon: <MessageIcon /> },
-        { label: "Ukończony", color: "#2e7d32", icon: <DoneIcon /> },
+        { label: "Ukończono", color: "#2e7d32", icon: <DoneIcon /> },
         {
-            label: "Przeniesiony do gry",
+            label: "Przeniesiono do gry",
             color: "#33691e",
             icon: <DoneAllIcon />,
         },
@@ -99,7 +103,7 @@ function Row(props) {
                 </TableCell>
             </TableRow>
             <TableRow>
-                <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+                <TableCell className={classes.cell} colSpan={6}>
                     <Collapse in={open} timeout="auto" unmountOnExit>
                         <Box margin={1}>
                             <Typography variant="h6" gutterBottom component="div">
@@ -165,9 +169,22 @@ function Row(props) {
             </TableRow>
         </>
     );
-}
+};
 
-export default props => {
+const useStyles = makeStyles(theme => ({
+    addButton: {
+        position: "fixed",
+        top: "90%",
+        left: "85%",
+    },
+    head: {
+        backgroundColor: theme.palette.background.default,
+    },
+}));
+
+const Characters = props => {
+    const classes = useStyles();
+
     const [open, setOpen] = useState(false);
     const [openConfirmation, setOpenConfirmation] = useState(false);
 
@@ -404,7 +421,7 @@ export default props => {
         <>
             <TableContainer component={Paper}>
                 <Table aria-label="collapsible table">
-                    <TableHead style={{ backgroundColor: "#000" }}>
+                    <TableHead className={classes.head}>
                         <TableRow>
                             <TableCell />
                             <TableCell>Nazwa</TableCell>
@@ -429,9 +446,9 @@ export default props => {
             </TableContainer>
 
             <Fab
+                className={classes.addButton}
                 color="secondary"
                 aria-label="add"
-                style={{ position: "fixed", top: "90%", left: "85%" }}
                 onClick={() => handleClickOpen(false)}
             >
                 <AddIcon />
@@ -537,3 +554,5 @@ export default props => {
         </>
     );
 };
+
+export default Characters;

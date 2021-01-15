@@ -3,22 +3,24 @@
         "version" : "0.2.6", 
         "changes" : [
             "Dodano okno wyświetlające listę zmian",
-            "Naprawiono 'czyszczenie' formularza po zmianie statusu zadania"
+            "Naprawiono \"czyszczenie\" formularza po zmianie statusu zadania",
+            "Drobne zmiany w wyglądzie aplikacji, takie jak kolorystyka i responywność",
+            "Dodano \"Mówcę\" Etap w edytorze dialogów"
         ]
     },
     {
         "version" : "0.2.5", 
         "changes" : [
-            "Dodano system 'Tras', czyli zmiany URI w zależności od aktualnej lokalizacji na stronie. Pozwala to na dodanie konkretnego modułu (np. edytora zadań) jako zakładkę w przeglądarce",
+            "Dodano system \"Tras\", czyli zmiany URI w zależności od aktualnej lokalizacji na stronie. Pozwala to na dodanie konkretnego modułu (np. edytora zadań) jako zakładkę w przeglądarce",
             "Naprawiono błędne wyświetlanie statusu zadania po otworzeniu edytora dialogów",
             "Naprawiono niepoprawną sygnalizację o błędzie pustego pola tekstowego po edycji dialogu",
-            "Przełącznik 'Przeniosiono do gry', który zmienia status zadania jest widoczny tylko dla administratorów"
+            "Przełącznik \"Przeniosiono do gry\", który zmienia status zadania jest widoczny tylko dla administratorów"
         ]
     },
     {
         "version" : "0.2.2", 
         "changes" : [
-            "Udostępniono aplikację dla członków ZajavaTeam",
+            "Udostępniono aplikację testerowi",
             "Dodano opcję usuwania i edycji zadań",
             "Dodano przełączniki do edytora dialogów, które pozwalają na zmianę statusu zadania",
             "Naprawiono błąd, który powodował niepoprawne odświeżanie listy zadań"
@@ -29,8 +31,8 @@
         "changes" : [
             "Dodano wyświetlanie informacji o błędach i sukcesach po wykonaniu niektórych akcji",
             "Dodano nowe zabezpieczenia do bazy danych, która przechowuje postaci i dialogi",
-            "Dodano wartość 'Status zadania', która informuje na jakim etapie znajduje się praca nad zadaniem",
-            "Dodano wartość 'Utworzono przez' do postaci, co pozwala na lepsze zarządzanie uprawnieniami bazy danych",
+            "Dodano wartość \"Status zadania\", która informuje na jakim etapie znajduje się praca nad zadaniem",
+            "Dodano wartość \"Utworzono przez\" do postaci, co pozwala na lepsze zarządzanie uprawnieniami bazy danych",
             "Naprawiono błąd, który powodował zmianę kolejności wiadomości po dodaniu nowej kwestii",
             "Dodano opcję, która umożliwia dodawanie nowych zadań do własnych postaci",
             "Poprawiono kilka wiadmości"
@@ -56,7 +58,7 @@
         "changes" : [
             "Przepisano aplikację przy użyciu biblioteki React",
             "Dodano system rang i ręcznej rejestracji użytkowników do bazy danych",
-            "Oddzielono 'Zajęcie' postaci od jej 'Nazwy'",
+            "Oddzielono \"Zajęcie\" postaci od jej \"Nazwy\"",
             "Dodano edytor dialogów (pozwala tylko na odczytywanie wiadomości)"
         ]
     }

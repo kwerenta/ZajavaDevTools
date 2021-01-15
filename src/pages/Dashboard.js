@@ -34,7 +34,7 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-export default function Dashboard() {
+const Dashboard = () => {
     const classes = useStyles();
 
     const { currentUser, userData } = useContext(UserContext);
@@ -66,7 +66,7 @@ export default function Dashboard() {
                 className={classes.grid}
                 spacing={4}
             >
-                <Grid item xs={6}>
+                <Grid item xs={12} md={6}>
                     <Card className={classes.card} variant="outlined">
                         <CardContent>
                             <Typography variant="h4" component="h2">
@@ -79,7 +79,7 @@ export default function Dashboard() {
                     </Card>
                 </Grid>
 
-                <Grid item xs={3}>
+                <Grid item xs={12} sm={6} md={3}>
                     <Card className={classes.card} variant="outlined">
                         <CardContent>
                             <Typography variant="h4" component="h2">
@@ -97,7 +97,7 @@ export default function Dashboard() {
                     </Card>
                 </Grid>
 
-                <Grid item xs={3}>
+                <Grid item xs={12} sm={6} md={3}>
                     <Card className={classes.card} variant="outlined">
                         <CardContent>
                             <Typography variant="h4" component="h2">
@@ -130,4 +130,5 @@ export default function Dashboard() {
             />
         </>
     );
-}
+};
+export default Dashboard;

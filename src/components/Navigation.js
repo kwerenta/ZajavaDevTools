@@ -107,7 +107,7 @@ const Navigation = props => {
 
     return (
         <div className={classes.root}>
-            <AppBar position="static">
+            <AppBar position="static" color="primary">
                 <Toolbar>
                     <IconButton
                         edge="start"
@@ -119,7 +119,7 @@ const Navigation = props => {
                         <MenuIcon />
                     </IconButton>
                     <Typography variant="h6" className={classes.title}>
-                        <Button component={Link} to="/">
+                        <Button color="inherit" component={Link} to="/">
                             ZajavaDevTools 😎
                         </Button>
                     </Typography>

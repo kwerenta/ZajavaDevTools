@@ -75,7 +75,7 @@ const QuestEditor = props => {
                         <Typography variant="h6" className={classes.title}>
                             Edytor zadań
                         </Typography>
-                        <Button color="secondary" disabled={quest && quest.status > 0} onClick={() => setOpen(true)}>
+                        <Button color="inherit" disabled={quest && quest.status > 0} onClick={() => setOpen(true)}>
                             Usuń zadanie
                         </Button>
                     </Toolbar>

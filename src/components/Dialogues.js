@@ -8,6 +8,8 @@ import { useCollectionData } from "react-firebase-hooks/firestore";
 
 import { makeStyles } from "@material-ui/core/styles";
 import clsx from "clsx";
+import Backdrop from "@material-ui/core/Backdrop";
+import CircularProgress from "@material-ui/core/CircularProgress";
 import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
 import Divider from "@material-ui/core/Divider";
@@ -37,18 +39,20 @@ import DoneAllIcon from "@material-ui/icons/DoneAll";
 import AssignmentIcon from "@material-ui/icons/Assignment";
 
 const useStyles = makeStyles(theme => ({
-    table: {
-        minWidth: 500,
-    },
     chatSection: {
         width: "100%",
         height: "93vh",
         overflow: "hidden",
     },
-    headBG: {
-        backgroundColor: "#e0e0e0",
+    formArea: {
+        marginTop: 0,
+        marginLeft: 0,
+        paddingRight: 40,
+        paddingTop: 10,
+        paddingBottom: 20,
+        borderTop: "1px solid #e0e0e0",
     },
-    borderRight500: {
+    leftPanel: {
         borderRight: "1px solid #e0e0e0",
     },
     messageArea: {
@@ -172,7 +176,7 @@ const Chat = props => {
         props.quest &&
         db.collection(`/characters/${props.character.id}/quests/${props.quest.id}/dialogues`);
     const query = dialoguesRef && dialoguesRef.orderBy("order");
-    const [dialogues] = useCollectionData(query, { idField: "id" });
+    const [dialogues, loading] = useCollectionData(query, { idField: "id" });
 
     const { userData } = useContext(UserContext);
 
@@ -315,7 +319,7 @@ const Chat = props => {
     return (
         <>
             <Grid container component={Paper} className={classes.chatSection}>
-                <Grid item xs={3} className={classes.borderRight500}>
+                <Grid item xs={3} className={classes.leftPanel}>
                     <List>
                         <ListItem key="NPC">
                             <ListItemIcon>
@@ -429,6 +433,9 @@ const Chat = props => {
                                     completed={questStatus.completed}
                                 />
                             ))}
+                        <Backdrop open={loading}>
+                            <CircularProgress color="inherit" />
+                        </Backdrop>
 
                         {/* <ListItem button disabled>
                             <Grid container justify="center" alignItems="center">
@@ -441,7 +448,7 @@ const Chat = props => {
                         <span ref={dummy}></span>
                     </List>
                     <Divider />
-                    <Grid container style={{ padding: "20px" }} spacing={4}>
+                    <Grid container className={classes.formArea} spacing={4}>
                         <Grid item xs={3}>
                             <FormControl disabled={questStatus.completed} variant="outlined" fullWidth>
                                 <InputLabel id="senderSelectLabelId">Mówca</InputLabel>

@@ -4,6 +4,7 @@ import { UserProvider } from "./User";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom/cjs/react-router-dom.min";
 import PrivateRoute from "./components/PrivateRoute";
 
+import CssBaseline from "@material-ui/core/CssBaseline";
 import Navigation from "./components/Navigation";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
@@ -15,14 +16,16 @@ import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
 const theme = createMuiTheme({
     palette: {
         type: "dark",
-        divider: "rgba(255, 255, 255, 0.12)",
         primary: {
-            main: "#2196f3",
             contrastText: "#fff",
+            light: "#63ccff",
+            main: "#009be5",
+            dark: "#006ca0",
         },
         secondary: {
+            light: "#f73378",
             main: "#f50057",
-            contrastText: "#fff",
+            dark: "#ab003c",
         },
     },
 });
@@ -32,6 +35,7 @@ function App() {
     return (
         <UserProvider>
             <ThemeProvider theme={theme}>
+                <CssBaseline />
                 <Router>
                     {navbar && <Navigation setNavbar={setNavbar} />}
                     <Switch>
