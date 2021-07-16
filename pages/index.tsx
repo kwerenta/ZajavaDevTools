@@ -1,6 +1,6 @@
 import Head from "next/head";
 import Layout from "../components/Layout";
-import Main from "../components/Main";
+import Wrapper from "../components/Wrapper";
 
 export default function Home() {
   return (
@@ -8,9 +8,14 @@ export default function Home() {
       <Head>
         <title>ZajavaDevTools</title>
       </Head>
-      <Main>
-        <h1>Contnet</h1>
-      </Main>
+      <Wrapper>
+        <header className="flex justify-between items-center">
+          <span>Postacie</span>
+        </header>
+        <section>
+          <article>Postać 1</article>
+        </section>
+      </Wrapper>
     </Layout>
   );
 }
