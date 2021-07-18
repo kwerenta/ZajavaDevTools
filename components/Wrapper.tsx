@@ -6,7 +6,7 @@ interface Props {
 
 export default function Wrapper({ children }: Props): ReactElement {
   return (
-    <main className="w-full flex-1 flex flex-col container mx-auto max-w-screen-md py-16 px-6 text-white">
+    <main className="w-full flex-1 flex flex-col container mx-auto max-w-4xl py-16 px-6 text-white">
       {children}
     </main>
   );

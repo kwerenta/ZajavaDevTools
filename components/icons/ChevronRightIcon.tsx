@@ -1,10 +1,10 @@
 import { ReactElement } from "react";
 
-export default function ChevronDownIcon(): ReactElement {
+export default function ChevronRightIcon(): ReactElement {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      className="w-4 h-4 text-zajavaBlue-500"
+      className="h-6 w-6 text-zajavaBlue-500"
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"
@@ -13,7 +13,7 @@ export default function ChevronDownIcon(): ReactElement {
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeWidth={2}
-        d="M19 9l-7 7-7-7"
+        d="M9 5l7 7-7 7"
       />
     </svg>
   );
