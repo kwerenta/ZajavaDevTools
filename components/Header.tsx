@@ -5,11 +5,13 @@ import AddIcon from "./icons/AddIcon";
 interface Props {
   title: string;
   createButtonText: string;
+  createButtonFn: () => void;
 }
 
 export default function Header({
   title,
   createButtonText,
+  createButtonFn,
 }: Props): ReactElement {
   return (
     <header className="flex items-center">
@@ -21,7 +23,10 @@ export default function Header({
           <span className="text-sm font-semibold">Sortowanie</span>
           <ChevronDownIcon />
         </button>
-        <button className="flex gap-2 items-center rounded-3xl px-4 py-3 bg-zajavaBlue-600 hover:bg-zajavaBlue-700 duration-300 transition-colors">
+        <button
+          className="flex gap-2 items-center rounded-3xl px-4 py-3 bg-zajavaBlue-600 hover:bg-zajavaBlue-700 duration-300 transition-colors"
+          onClick={createButtonFn}
+        >
           <AddIcon />
           <span className="text-sm font-semibold">{createButtonText}</span>
         </button>

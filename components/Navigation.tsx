@@ -5,7 +5,7 @@ interface Props {}
 
 export default function Navigation({}: Props): ReactElement {
   return (
-    <nav className="sticky top-0 z-20 flex items-center lg:flex-col lg:rounded-r-2xl bg-zajavaBlue-800">
+    <nav className="sticky top-0 z-30 flex items-center lg:flex-col lg:rounded-r-2xl bg-zajavaBlue-800">
       <Link href="/">
         <a>
           <div

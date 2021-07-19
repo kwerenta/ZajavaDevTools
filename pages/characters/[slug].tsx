@@ -13,7 +13,11 @@ export default function Character(): ReactElement {
   return (
     <Layout>
       <Wrapper>
-        <Header title={slug} createButtonText="Dodaj zadanie" />
+        <Header
+          title={slug}
+          createButtonText="Dodaj zadanie"
+          createButtonFn={() => ({})}
+        />
         <section>
           <ul className="flex flex-col gap-4 mt-20">
             <QuestItem />
