@@ -7,7 +7,7 @@ interface Props {
 export default function ListContainer({ children }: Props): ReactElement {
   return (
     <section>
-      <ul className="flex flex-col gap-4 mt-20">{children}</ul>
+      <ul className="flex flex-col gap-4">{children}</ul>
     </section>
   );
 }
