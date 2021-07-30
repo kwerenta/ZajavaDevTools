@@ -1,9 +1,11 @@
 import Link from "next/link";
 import React, { ReactElement } from "react";
+import { useAuth } from "../contexts/AuthContext";
 
 interface Props {}
 
 export default function Navigation({}: Props): ReactElement {
+  const auth = useAuth();
   return (
     <nav className="sticky top-0 z-30 flex items-center lg:flex-col lg:rounded-r-2xl bg-zajavaBlue-800">
       <Link href="/">
@@ -29,6 +31,14 @@ export default function Navigation({}: Props): ReactElement {
           </div>
         </a>
       </Link>
+      <div className="ml-auto lg:ml-0 lg:mt-auto mb-4">
+        <button
+          onClick={() => {}}
+          className={`w-14 h-14 rounded-full pt-4 ${
+            auth.currentUser ? "bg-zajavaBlue-500" : "bg-red-900"
+          }`}
+        ></button>
+      </div>
     </nav>
   );
 }

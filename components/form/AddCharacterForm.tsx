@@ -34,10 +34,11 @@ export default function AddCharacterForm({ handleClose }: Props): ReactElement {
           {() => (
             <Form className="flex flex-col">
               <h2 className="text-2xl font-bold mb-12">Tworzenie postaci</h2>
+
               <FormField label="Nazwa postaci" name="name" type="text" />
               <FormField label="Zajęcie" name="occupation" type="text" />
               <FormField label="Lokalizacja" name="location" type="text" />
-              {/* <FormField label="Skin" name="skin" type="file" /> */}
+
               <div className="absolute right-0 left-0 px-16 bottom-0 h-24 flex items-center justify-between border-t-2 border-opacity-60 border-zajavaBlue-800">
                 <Button type="reset" variant="CANCEL" onClick={handleClose}>
                   Anuluj

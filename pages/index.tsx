@@ -15,7 +15,6 @@ export default function Home() {
   const handleCloseForm = () => {
     setIsFormOpened(false);
   };
-
   return (
     <Layout>
       <Head>
