@@ -4,6 +4,8 @@ import React, { ReactElement } from "react";
 import FormField from "./FormField";
 import Backdrop from "../Backdrop";
 import Button from "../Button";
+import { db } from "../../firebase";
+import { useAuth } from "../../contexts/AuthContext";
 
 const validationSchema = object().shape({
   name: string()
@@ -22,6 +24,7 @@ interface Props {
 }
 
 export default function AddCharacterForm({ handleClose }: Props): ReactElement {
+  const { currentUser } = useAuth();
   return (
     <>
       <aside className="fixed lg:left-24 z-20 top-20 lg:top-0 left-0 bottom-0 md:max-w-2xl w-full md:p-16 p-20 bg-zajavaBlue-900">
@@ -29,7 +32,21 @@ export default function AddCharacterForm({ handleClose }: Props): ReactElement {
           validationSchema={validationSchema}
           validate={() => ({})}
           initialValues={{ name: "", location: "", occupation: "" }}
-          onSubmit={values => console.log(values)}
+          onSubmit={async ({ location, name, occupation }) => {
+            if (!currentUser) return;
+            try {
+              const newCharacter = await db.characters.add({
+                name,
+                location,
+                occupation,
+                createdBy: currentUser.uid,
+                createdAt: db.getCurrentTimestamp(),
+              });
+            } catch (e) {
+              console.error(e);
+            }
+            handleClose();
+          }}
         >
           {() => (
             <Form className="flex flex-col">

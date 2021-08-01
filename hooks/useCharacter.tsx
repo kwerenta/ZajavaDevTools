@@ -20,9 +20,7 @@ export function useCharacter(): Type {
     db.characters
       .get()
       .then(res => {
-        setCharacters(
-          res.docs.map(doc => ({ ...doc.data(), uid: doc.id } as Character))
-        );
+        setCharacters(res.docs.map(doc => db.formatDoc(doc)));
         setIsLoading(false);
       })
       .catch(() => {

@@ -22,7 +22,7 @@ export default function Home() {
   return (
     <Layout>
       <Head>
-        <title>ZajavaDevTools</title>
+        <title>ZajavaDevTools | Postacie</title>
       </Head>
       <Wrapper>
         {isFormOpened && <AddCharacterForm handleClose={handleCloseForm} />}
@@ -38,7 +38,7 @@ export default function Home() {
                   <CharacterItem key={character.uid} character={character} />
                 ))
               : "Brak danych"
-            : [...Array(3)].map((_, idx) => <SkeletonItem key={idx} />)}
+            : [...Array(5)].map((_, idx) => <SkeletonItem key={idx} />)}
         </ListContainer>
       </Wrapper>
     </Layout>

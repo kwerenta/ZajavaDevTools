@@ -2,6 +2,7 @@ import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
 import "firebase/analytics";
+import { Character } from "./hooks/useCharacter";
 
 const app = !firebase.apps.length
   ? firebase.initializeApp({
@@ -23,8 +24,10 @@ export const authProviders = {
 const firestore = app.firestore();
 export const db = {
   characters: firestore.collection("characters"),
-  // users: firestore.collection("users"),
-  // getCurrentTimestamp: firebase.firestore.FieldValue.serverTimestamp,
+  formatDoc: <Type extends unknown>(
+    doc: firebase.firestore.QueryDocumentSnapshot<firebase.firestore.DocumentData>
+  ): Type => ({ ...doc.data(), uid: doc.id } as Type),
+  getCurrentTimestamp: firebase.firestore.FieldValue.serverTimestamp,
 };
 
 // const analytics = app.analytics();
