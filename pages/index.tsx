@@ -6,9 +6,13 @@ import Layout from "../components/Layout";
 import ListContainer from "../components/list/ListContainer";
 import Wrapper from "../components/Wrapper";
 import AddCharacterForm from "../components/form/AddCharacterForm";
+import { Character, useCharacter } from "../hooks/useCharacter";
+import SkeletonItem from "../components/list/SkeletonItem";
 
 export default function Home() {
   const [isFormOpened, setIsFormOpened] = useState(false);
+  const [characters, isLoading] = useCharacter();
+
   const handleOpenForm = () => {
     setIsFormOpened(true);
   };
@@ -28,9 +32,13 @@ export default function Home() {
           createButtonFn={handleOpenForm}
         />
         <ListContainer>
-          {[0, 1, 2, 3].map((_, idx) => (
-            <CharacterItem key={idx} />
-          ))}
+          {!isLoading
+            ? characters.length
+              ? characters.map((character: Character) => (
+                  <CharacterItem key={character.uid} character={character} />
+                ))
+              : "Brak danych"
+            : [...Array(3)].map((_, idx) => <SkeletonItem key={idx} />)}
         </ListContainer>
       </Wrapper>
     </Layout>

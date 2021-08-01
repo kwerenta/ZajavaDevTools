@@ -7,7 +7,7 @@ interface Props {}
 export default function Navigation({}: Props): ReactElement {
   const auth = useAuth();
   return (
-    <nav className="sticky top-0 z-30 flex items-center lg:flex-col lg:rounded-r-2xl bg-zajavaBlue-800">
+    <nav className="sticky max-h-screen top-0 z-30 flex items-center lg:flex-col lg:rounded-r-2xl bg-zajavaBlue-800">
       <Link href="/">
         <a>
           <div
@@ -31,10 +31,11 @@ export default function Navigation({}: Props): ReactElement {
           </div>
         </a>
       </Link>
-      <div className="ml-auto lg:ml-0 lg:mt-auto mb-4">
+      <div className="ml-auto lg:mt-auto mr-4 lg:mx-0 lg:mb-4">
         <button
+          disabled={auth.isLoading}
           onClick={() => {
-            auth.loginWithGoogle();
+            auth.currentUser ? auth.logout() : auth.loginWithGoogle();
           }}
           className={`w-14 h-14 rounded-full pt-4 ${
             auth.currentUser ? "bg-zajavaBlue-500" : "bg-red-900"

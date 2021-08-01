@@ -6,12 +6,14 @@ interface Props {
 }
 
 interface valueTypes {
+  isLoading: boolean;
   currentUser: firebase.default.User | null;
   logout: () => void;
   loginWithGoogle: () => void;
 }
 
 const initialValues: valueTypes = {
+  isLoading: true,
   currentUser: null,
   logout: () => {},
   loginWithGoogle: () => {},
@@ -47,14 +49,11 @@ export const AuthProvider = ({ children }: Props) => {
   }, []);
 
   const value: valueTypes = {
+    isLoading,
     currentUser,
     logout,
     loginWithGoogle,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {!isLoading && children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
