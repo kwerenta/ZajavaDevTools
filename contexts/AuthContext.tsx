@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { auth } from "../firebase";
+import { auth, authProviders } from "../firebase";
 
 interface Props {
   children: React.ReactNode;
@@ -8,11 +8,13 @@ interface Props {
 interface valueTypes {
   currentUser: firebase.default.User | null;
   logout: () => void;
+  loginWithGoogle: () => void;
 }
 
 const initialValues: valueTypes = {
   currentUser: null,
   logout: () => {},
+  loginWithGoogle: () => {},
 };
 
 const AuthContext = createContext(initialValues);
@@ -31,6 +33,10 @@ export const AuthProvider = ({ children }: Props) => {
     return auth.signOut();
   }
 
+  function loginWithGoogle() {
+    return auth.signInWithPopup(authProviders.google);
+  }
+
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(user => {
       setCurrentUser(user);
@@ -43,11 +49,12 @@ export const AuthProvider = ({ children }: Props) => {
   const value: valueTypes = {
     currentUser,
     logout,
+    loginWithGoogle,
   };
 
   return (
     <AuthContext.Provider value={value}>
-      {isLoading && children}
+      {!isLoading && children}
     </AuthContext.Provider>
   );
 };

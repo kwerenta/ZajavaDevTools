@@ -33,7 +33,9 @@ export default function Navigation({}: Props): ReactElement {
       </Link>
       <div className="ml-auto lg:ml-0 lg:mt-auto mb-4">
         <button
-          onClick={() => {}}
+          onClick={() => {
+            auth.loginWithGoogle();
+          }}
           className={`w-14 h-14 rounded-full pt-4 ${
             auth.currentUser ? "bg-zajavaBlue-500" : "bg-red-900"
           }`}
