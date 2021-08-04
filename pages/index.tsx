@@ -6,12 +6,12 @@ import Layout from "../components/Layout";
 import ListContainer from "../components/list/ListContainer";
 import Wrapper from "../components/Wrapper";
 import AddCharacterForm from "../components/form/AddCharacterForm";
-import { Character, useCharacter } from "../hooks/useCharacter";
 import SkeletonItem from "../components/list/SkeletonItem";
+import { Character, useCharacter } from "../contexts/CharacterContext";
 
 export default function Home() {
   const [isFormOpened, setIsFormOpened] = useState(false);
-  const [characters, isLoading] = useCharacter();
+  const { characters, isLoading } = useCharacter();
 
   const handleOpenForm = () => {
     setIsFormOpened(true);

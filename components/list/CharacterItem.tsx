@@ -1,5 +1,5 @@
 import React, { ReactElement } from "react";
-import { Character } from "../../hooks/useCharacter";
+import { Character } from "../../contexts/CharacterContext";
 import ChevronRightIcon from "../icons/ChevronRightIcon";
 import ListItem from "./ListItem";
 
