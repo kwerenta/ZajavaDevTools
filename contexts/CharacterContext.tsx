@@ -1,11 +1,4 @@
-import {
-  DocumentReference,
-  getDoc,
-  getDocs,
-  orderBy,
-  query,
-  Timestamp,
-} from "firebase/firestore/lite";
+import { getDocs, orderBy, query, Timestamp } from "firebase/firestore/lite";
 import React, {
   createContext,
   ReactElement,
@@ -16,19 +9,19 @@ import React, {
 import { db } from "../firebase";
 
 export interface Character {
+  uid: string;
   location: string;
-  skin: string;
   name: string;
   occupation: string;
   createdBy: string;
   createdAt?: Timestamp;
-  uid: string;
+  skin?: string;
 }
 
 interface valueTypes {
   characters: Character[];
   isLoading: boolean;
-  addCharacter: (ref: DocumentReference) => void;
+  addCharacter: (character: Character) => void;
 }
 
 interface Props {
@@ -51,10 +44,7 @@ export function CharacterProvider({ children }: Props): ReactElement {
   const [characters, setCharacters] = useState<Character[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const addCharacter = async (ref: DocumentReference) => {
-    const doc = await getDoc(ref);
-    if (!doc) return;
-    const character = db.formatDoc<Character>(doc);
+  const addCharacter = async (character: Character) => {
     setCharacters(prevCharacters =>
       [...prevCharacters, character].sort((a, b) =>
         a.name.toLocaleLowerCase() > b.name.toLocaleLowerCase() ? 1 : -1
