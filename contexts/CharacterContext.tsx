@@ -45,9 +45,9 @@ export function CharacterProvider({ children }: Props): ReactElement {
   const [isLoading, setIsLoading] = useState(true);
 
   const addCharacter = async (
-    ref: firebase.default.firestore.DocumentReference<firebase.default.firestore.DocumentData>
+    data: firebase.default.firestore.DocumentData
   ) => {
-    const doc = await ref.get();
+    const doc = await data.get();
     if (!doc) return;
     const character = db.formatDoc<Character>(doc);
     setCharacters(prevCharacters =>
