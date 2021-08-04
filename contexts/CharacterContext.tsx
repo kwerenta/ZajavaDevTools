@@ -1,3 +1,11 @@
+import {
+  DocumentReference,
+  getDoc,
+  getDocs,
+  orderBy,
+  query,
+  Timestamp,
+} from "firebase/firestore/lite";
 import React, {
   createContext,
   ReactElement,
@@ -13,15 +21,14 @@ export interface Character {
   name: string;
   occupation: string;
   createdBy: string;
+  createdAt?: Timestamp;
   uid: string;
 }
 
 interface valueTypes {
   characters: Character[];
   isLoading: boolean;
-  addCharacter: (
-    characterDoc: firebase.default.firestore.DocumentReference<firebase.default.firestore.DocumentData>
-  ) => void;
+  addCharacter: (ref: DocumentReference) => void;
 }
 
 interface Props {
@@ -44,10 +51,8 @@ export function CharacterProvider({ children }: Props): ReactElement {
   const [characters, setCharacters] = useState<Character[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const addCharacter = async (
-    data: firebase.default.firestore.DocumentData
-  ) => {
-    const doc = await data.get();
+  const addCharacter = async (ref: DocumentReference) => {
+    const doc = await getDoc(ref);
     if (!doc) return;
     const character = db.formatDoc<Character>(doc);
     setCharacters(prevCharacters =>
@@ -58,9 +63,9 @@ export function CharacterProvider({ children }: Props): ReactElement {
   };
 
   useEffect(() => {
-    db.characters
-      .orderBy("name")
-      .get()
+    const q = query(db.characters, orderBy("name"));
+
+    getDocs(q)
       .then(res => {
         setCharacters(res.docs.map(doc => db.formatDoc(doc)));
         setIsLoading(false);

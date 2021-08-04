@@ -1,10 +1,15 @@
-import firebase from "firebase/compat/app";
+import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { initializeAnalytics } from "firebase/analytics";
-import "firebase/compat/firestore";
+import { getAnalytics } from "firebase/analytics";
 
-const app = !firebase.apps.length
-  ? firebase.initializeApp({
+import {
+  getFirestore,
+  collection,
+  DocumentData,
+} from "firebase/firestore/lite";
+
+const app = !getApps().length
+  ? initializeApp({
       apiKey: process.env.NEXT_PUBLIC_FIREBASE_KEY,
       authDomain: process.env.NEXT_PUBLIC_FIREBASE_DOMAIN,
       projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
@@ -13,19 +18,23 @@ const app = !firebase.apps.length
       appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
       measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
     })
-  : firebase.app();
+  : getApp();
 
 export const auth = getAuth(app);
 
-const firestore = app.firestore();
+export const firestore = getFirestore(app);
 export const db = {
-  characters: firestore.collection("characters"),
-  formatDoc: <Type extends unknown>(
-    doc: firebase.firestore.DocumentData
-  ): Type => ({ ...doc.data(), uid: doc.id } as Type),
-  getCurrentTimestamp: firebase.firestore.FieldValue.serverTimestamp,
+  characters: collection(firestore, "characters"),
+  formatDoc: <Type>(doc: DocumentData): Type => ({
+    ...doc.data(),
+    uid: doc.id,
+  }),
 };
 
-initializeAnalytics(app);
-
-export default app;
+//Initialize analytics only in browser
+(async () => {
+  if (typeof window !== "undefined" && !getAnalytics()) {
+    const { initializeAnalytics } = await import("firebase/analytics");
+    initializeAnalytics(app);
+  }
+})();

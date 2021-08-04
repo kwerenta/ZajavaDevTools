@@ -7,6 +7,7 @@ import Button from "../Button";
 import { db } from "../../firebase";
 import { useAuth } from "../../contexts/AuthContext";
 import { useCharacter } from "../../contexts/CharacterContext";
+import { serverTimestamp, addDoc } from "firebase/firestore/lite";
 
 const validationSchema = object().shape({
   name: string()
@@ -37,12 +38,12 @@ export default function AddCharacterForm({ handleClose }: Props): ReactElement {
           onSubmit={async ({ location, name, occupation }) => {
             if (!currentUser) return;
             try {
-              const newCharacter = await db.characters.add({
+              const newCharacter = await addDoc(db.characters, {
                 name,
                 location,
                 occupation,
                 createdBy: currentUser.uid,
-                createdAt: db.getCurrentTimestamp(),
+                createdAt: serverTimestamp(),
               });
               addCharacter(newCharacter);
             } catch (e) {
