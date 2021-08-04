@@ -6,6 +6,7 @@ import Backdrop from "../Backdrop";
 import Button from "../Button";
 import { db } from "../../firebase";
 import { useAuth } from "../../contexts/AuthContext";
+import { useCharacter } from "../../contexts/CharacterContext";
 
 const validationSchema = object().shape({
   name: string()
@@ -25,6 +26,7 @@ interface Props {
 
 export default function AddCharacterForm({ handleClose }: Props): ReactElement {
   const { currentUser } = useAuth();
+  const { addCharacter } = useCharacter();
   return (
     <>
       <aside className="fixed lg:left-24 z-20 top-20 lg:top-0 left-0 bottom-0 md:max-w-2xl w-full md:p-16 p-20 bg-zajavaBlue-900">
@@ -42,6 +44,7 @@ export default function AddCharacterForm({ handleClose }: Props): ReactElement {
                 createdBy: currentUser.uid,
                 createdAt: db.getCurrentTimestamp(),
               });
+              addCharacter(newCharacter);
             } catch (e) {
               console.error(e);
             }

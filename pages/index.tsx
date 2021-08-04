@@ -12,7 +12,6 @@ import { Character, useCharacter } from "../contexts/CharacterContext";
 export default function Home() {
   const [isFormOpened, setIsFormOpened] = useState(false);
   const { characters, isLoading } = useCharacter();
-
   const handleOpenForm = () => {
     setIsFormOpened(true);
   };

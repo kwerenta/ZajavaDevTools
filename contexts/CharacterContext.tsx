@@ -19,6 +19,9 @@ export interface Character {
 interface valueTypes {
   characters: Character[];
   isLoading: boolean;
+  addCharacter: (
+    characterDoc: firebase.default.firestore.DocumentReference<firebase.default.firestore.DocumentData>
+  ) => void;
 }
 
 interface Props {
@@ -28,6 +31,7 @@ interface Props {
 const initialValues = {
   characters: [],
   isLoading: true,
+  addCharacter: () => {},
 };
 
 const CharacterContext = createContext<valueTypes>(initialValues);
@@ -40,22 +44,38 @@ export function CharacterProvider({ children }: Props): ReactElement {
   const [characters, setCharacters] = useState<Character[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const addCharacter = async (
+    ref: firebase.default.firestore.DocumentReference<firebase.default.firestore.DocumentData>
+  ) => {
+    const doc = await ref.get();
+    if (!doc) return;
+    const character = db.formatDoc<Character>(doc);
+    setCharacters(prevCharacters =>
+      [...prevCharacters, character].sort((a, b) =>
+        a.name.toLocaleLowerCase() > b.name.toLocaleLowerCase() ? 1 : -1
+      )
+    );
+  };
+
   useEffect(() => {
     db.characters
+      .orderBy("name")
       .get()
       .then(res => {
         setCharacters(res.docs.map(doc => db.formatDoc(doc)));
         setIsLoading(false);
       })
-      .catch(() => {
+      .catch(err => {
         setCharacters([]);
         setIsLoading(false);
+        console.error(err);
       });
   }, []);
 
   const value: valueTypes = {
     characters,
     isLoading,
+    addCharacter,
   };
   return (
     <CharacterContext.Provider value={value}>
