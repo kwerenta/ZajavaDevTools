@@ -1,5 +1,12 @@
+import {
+  GoogleAuthProvider,
+  onAuthStateChanged,
+  signInWithPopup,
+  signOut,
+  User,
+} from "firebase/auth";
 import { createContext, useContext, useEffect, useState } from "react";
-import { auth, authProviders } from "../firebase";
+import { auth } from "../firebase";
 
 interface Props {
   children: React.ReactNode;
@@ -7,7 +14,7 @@ interface Props {
 
 interface valueTypes {
   isLoading: boolean;
-  currentUser: firebase.default.User | null;
+  currentUser: User | null;
   logout: () => void;
   loginWithGoogle: () => void;
 }
@@ -26,21 +33,19 @@ export function useAuth() {
 }
 
 export const AuthProvider = ({ children }: Props) => {
-  const [currentUser, setCurrentUser] = useState<firebase.default.User | null>(
-    null
-  );
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   function logout() {
-    return auth.signOut();
+    return signOut(auth);
   }
 
   function loginWithGoogle() {
-    return auth.signInWithPopup(authProviders.google);
+    return signInWithPopup(auth, new GoogleAuthProvider());
   }
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(user => {
+    const unsubscribe = onAuthStateChanged(auth, user => {
       setCurrentUser(user);
       setIsLoading(false);
     });

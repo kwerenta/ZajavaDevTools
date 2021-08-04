@@ -1,7 +1,7 @@
 import firebase from "firebase/compat/app";
-import "firebase/compat/auth";
+import { getAuth } from "firebase/auth";
+import { initializeAnalytics } from "firebase/analytics";
 import "firebase/compat/firestore";
-import "firebase/compat/analytics";
 
 const app = !firebase.apps.length
   ? firebase.initializeApp({
@@ -15,10 +15,7 @@ const app = !firebase.apps.length
     })
   : firebase.app();
 
-export const auth = app.auth();
-export const authProviders = {
-  google: new firebase.auth.GoogleAuthProvider(),
-};
+export const auth = getAuth(app);
 
 const firestore = app.firestore();
 export const db = {
@@ -29,6 +26,6 @@ export const db = {
   getCurrentTimestamp: firebase.firestore.FieldValue.serverTimestamp,
 };
 
-// const analytics = app.analytics();
+initializeAnalytics(app);
 
 export default app;
