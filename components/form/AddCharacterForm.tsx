@@ -1,25 +1,12 @@
+import { addDoc, serverTimestamp, Timestamp } from "firebase/firestore/lite";
 import { Form, Formik } from "formik";
-import { object, string } from "yup";
 import React, { ReactElement } from "react";
-import FormField from "./FormField";
+import { useAuth } from "../../contexts/AuthContext";
+import { useCharacter } from "../../contexts/CharacterContext";
+import { db } from "../../firebase";
 import Backdrop from "../Backdrop";
 import Button from "../Button";
-import { db } from "../../firebase";
-import { useAuth } from "../../contexts/AuthContext";
-import { Character, useCharacter } from "../../contexts/CharacterContext";
-import { serverTimestamp, addDoc, Timestamp } from "firebase/firestore/lite";
-
-const validationSchema = object().shape({
-  name: string()
-    .required("To pole jest wymagane")
-    .max(255, "Maksymalna długość to 255 znaków"),
-  occupation: string()
-    .required("To pole jest wymagane")
-    .max(255, "Maksymalna długość to 255 znaków"),
-  location: string()
-    .required("To pole jest wymagane")
-    .max(255, "Maksymalna długość to 255 znaków"),
-});
+import FormField from "./FormField";
 
 interface Props {
   handleClose: () => void;
@@ -27,13 +14,20 @@ interface Props {
 
 export default function AddCharacterForm({ handleClose }: Props): ReactElement {
   const { currentUser } = useAuth();
-  const { addCharacter, characters } = useCharacter();
+  const { addCharacter } = useCharacter();
   return (
     <>
       <aside className="fixed lg:left-24 z-20 top-20 lg:top-0 left-0 bottom-0 md:max-w-2xl w-full md:p-16 p-20 bg-zajavaBlue-900">
         <Formik
-          validationSchema={validationSchema}
-          validate={() => ({})}
+          validate={values => {
+            const errors: any = {};
+            Object.entries(values).forEach(([key, value]) => {
+              if (!value.length) errors[key] = "To pole jest wymagane";
+              else if (value.length > 255)
+                errors[key] = "Maksymalna długość to 255 znaków";
+            });
+            return errors;
+          }}
           initialValues={{ name: "", location: "", occupation: "" }}
           onSubmit={async ({ location, name, occupation }) => {
             if (!currentUser) return;
