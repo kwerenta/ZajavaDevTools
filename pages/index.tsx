@@ -8,6 +8,7 @@ import Wrapper from "../components/Wrapper";
 import AddCharacterForm from "../components/form/AddCharacterForm";
 import SkeletonItem from "../components/list/SkeletonItem";
 import { Character, useCharacter } from "../contexts/CharacterContext";
+import { AnimatePresence } from "framer-motion";
 
 export default function Home() {
   const [isFormOpened, setIsFormOpened] = useState(false);
@@ -24,7 +25,9 @@ export default function Home() {
         <title>ZajavaDevTools | Postacie</title>
       </Head>
       <Wrapper>
-        {isFormOpened && <AddCharacterForm handleClose={handleCloseForm} />}
+        <AnimatePresence>
+          {isFormOpened && <AddCharacterForm handleClose={handleCloseForm} />}
+        </AnimatePresence>
         <Header
           title="Postacie"
           createButtonText="Utwórz postać"
