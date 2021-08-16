@@ -11,7 +11,9 @@ import { useCharacter } from "../../contexts/CharacterContext";
 export default function Character(): ReactElement {
   const { query } = useRouter();
   const id = query.id;
-  const { characters } = useCharacter();
+  const {
+    state: { characters },
+  } = useCharacter();
 
   const character = characters.find(char => char.uid === id) || {
     name: "",

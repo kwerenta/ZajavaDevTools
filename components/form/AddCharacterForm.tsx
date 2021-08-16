@@ -2,7 +2,7 @@ import { addDoc, serverTimestamp, Timestamp } from "firebase/firestore/lite";
 import { Form, Formik } from "formik";
 import React, { ReactElement } from "react";
 import { useAuth } from "../../contexts/AuthContext";
-import { useCharacter } from "../../contexts/CharacterContext";
+import { Character, useCharacter } from "../../contexts/CharacterContext";
 import { db } from "../../firebase";
 import Button from "../Button";
 import AsideFormContainer from "./AsideFormContainer";
@@ -14,7 +14,7 @@ interface Props {
 
 export default function AddCharacterForm({ handleClose }: Props): ReactElement {
   const { currentUser } = useAuth();
-  const { addCharacter } = useCharacter();
+  const { dispatch } = useCharacter();
   return (
     <AsideFormContainer handleClose={handleClose}>
       <Formik
@@ -39,7 +39,8 @@ export default function AddCharacterForm({ handleClose }: Props): ReactElement {
               createdAt: serverTimestamp() as Timestamp,
             };
             const { id: uid } = await addDoc(db.characters, data);
-            addCharacter({ ...data, uid });
+            const character = { ...data, uid };
+            dispatch({ type: "CREATE", payload: { character } });
           } catch (e) {
             console.error(e);
           }

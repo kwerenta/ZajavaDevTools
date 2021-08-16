@@ -12,7 +12,9 @@ import { AnimatePresence } from "framer-motion";
 
 export default function Home() {
   const [isFormOpened, setIsFormOpened] = useState(false);
-  const { characters, isLoading } = useCharacter();
+  const {
+    state: { isLoading, characters },
+  } = useCharacter();
   const handleOpenForm = () => {
     setIsFormOpened(true);
   };

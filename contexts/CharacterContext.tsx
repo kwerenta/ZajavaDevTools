@@ -4,9 +4,11 @@ import React, {
   ReactElement,
   useContext,
   useEffect,
+  useReducer,
   useState,
 } from "react";
 import { db } from "../firebase";
+import { charactersReducer } from "../reducers/charactersReducer";
 
 export interface Character {
   uid: string;
@@ -18,62 +20,61 @@ export interface Character {
   skin?: string;
 }
 
-interface valueTypes {
+export interface State {
   characters: Character[];
   isLoading: boolean;
-  addCharacter: (character: Character) => void;
+  error?: string;
 }
+
+export interface Action {
+  type: "ERROR" | "SUCCESS" | "CREATE";
+  payload: { characters?: Character[]; error?: string; character?: Character };
+}
+
+const initialValue: State = {
+  characters: [],
+  isLoading: true,
+};
 
 interface Props {
   children: React.ReactNode;
 }
 
-const initialValues = {
-  characters: [],
-  isLoading: true,
-  addCharacter: () => {},
-};
-
-const CharacterContext = createContext<valueTypes>(initialValues);
+const CharacterContext = createContext<{
+  state: State;
+  dispatch: React.Dispatch<Action>;
+}>({
+  state: initialValue,
+  dispatch: () => null,
+});
 
 export function useCharacter() {
   return useContext(CharacterContext);
 }
 
 export function CharacterProvider({ children }: Props): ReactElement {
-  const [characters, setCharacters] = useState<Character[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const addCharacter = async (character: Character) => {
-    setCharacters(prevCharacters =>
-      [...prevCharacters, character].sort((a, b) =>
-        a.name.toLocaleLowerCase() > b.name.toLocaleLowerCase() ? 1 : -1
-      )
-    );
-  };
+  const [state, dispatch] = useReducer(charactersReducer, {
+    isLoading: true,
+    characters: [],
+  });
 
   useEffect(() => {
     const q = query(db.characters, orderBy("name"));
 
     getDocs(q)
       .then(res => {
-        setCharacters(res.docs.map(doc => db.formatDoc(doc)));
-        setIsLoading(false);
+        dispatch({
+          type: "SUCCESS",
+          payload: { characters: res.docs.map(doc => db.formatDoc(doc)) },
+        });
       })
-      .catch(err => {
-        setCharacters([]);
-        setIsLoading(false);
-        console.error(err);
+      .catch(error => {
+        dispatch({ type: "ERROR", payload: { error } });
       });
   }, []);
 
-  const value: valueTypes = {
-    characters,
-    isLoading,
-    addCharacter,
-  };
   return (
-    <CharacterContext.Provider value={value}>
+    <CharacterContext.Provider value={{ state, dispatch }}>
       {children}
     </CharacterContext.Provider>
   );
