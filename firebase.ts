@@ -1,6 +1,6 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getAnalytics } from "firebase/analytics";
+
 import {
   getFirestore,
   collection,
@@ -29,11 +29,3 @@ export const db = {
     uid: doc.id,
   }),
 };
-
-//Initialize analytics only in browser
-(async () => {
-  if (typeof window !== "undefined" && !getAnalytics()) {
-    const { initializeAnalytics } = await import("firebase/analytics");
-    initializeAnalytics(app);
-  }
-})();
