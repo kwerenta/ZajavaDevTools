@@ -40,7 +40,7 @@ export default function AddCharacterForm({ handleClose }: Props): ReactElement {
             };
             const { id: uid } = await addDoc(db.characters, data);
             const character = { ...data, uid };
-            dispatch({ type: "CREATE", payload: { character } });
+            dispatch({ type: "CREATE", character });
           } catch (e) {
             console.error(e);
           }

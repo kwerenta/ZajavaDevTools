@@ -26,10 +26,13 @@ export interface State {
   error?: string;
 }
 
-export interface Action {
-  type: "ERROR" | "SUCCESS" | "CREATE";
-  payload: { characters?: Character[]; error?: string; character?: Character };
-}
+export type Action =
+  | { type: "SUCCESS"; characters: Character[] }
+  | {
+      type: "ERROR";
+      error: string;
+    }
+  | { type: "CREATE"; character: Character };
 
 const initialValue: State = {
   characters: [],
@@ -65,11 +68,11 @@ export function CharacterProvider({ children }: Props): ReactElement {
       .then(res => {
         dispatch({
           type: "SUCCESS",
-          payload: { characters: res.docs.map(doc => db.formatDoc(doc)) },
+          characters: res.docs.map(doc => db.formatDoc(doc)),
         });
       })
       .catch(error => {
-        dispatch({ type: "ERROR", payload: { error } });
+        dispatch({ type: "ERROR", error });
       });
   }, []);
 
