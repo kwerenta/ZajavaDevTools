@@ -10,9 +10,10 @@ import FormField from "./FormField";
 
 interface Props {
   handleClose: () => void;
+  character?: Character;
 }
 
-export default function AddCharacterForm({ handleClose }: Props): ReactElement {
+export default function CharacterForm({ handleClose }: Props): ReactElement {
   const { currentUser } = useAuth();
   const { dispatch } = useCharacter();
   return (

@@ -5,7 +5,7 @@ import Header from "../components/Header";
 import Layout from "../components/Layout";
 import ListContainer from "../components/list/ListContainer";
 import Wrapper from "../components/Wrapper";
-import AddCharacterForm from "../components/form/AddCharacterForm";
+import CharacterForm from "../components/form/CharacterForm";
 import SkeletonItem from "../components/list/SkeletonItem";
 import { Character, useCharacter } from "../contexts/CharacterContext";
 import { AnimatePresence } from "framer-motion";
@@ -13,7 +13,7 @@ import { AnimatePresence } from "framer-motion";
 export default function Home() {
   const [isFormOpened, setIsFormOpened] = useState(false);
   const {
-    state: { isLoading, characters },
+    state: { isLoading, characters, error },
   } = useCharacter();
   const handleOpenForm = () => {
     setIsFormOpened(true);
@@ -28,7 +28,7 @@ export default function Home() {
       </Head>
       <Wrapper>
         <AnimatePresence>
-          {isFormOpened && <AddCharacterForm handleClose={handleCloseForm} />}
+          {isFormOpened && <CharacterForm handleClose={handleCloseForm} />}
         </AnimatePresence>
         <Header
           title="Postacie"
@@ -41,7 +41,9 @@ export default function Home() {
               ? characters.map((character: Character) => (
                   <CharacterItem key={character.uid} character={character} />
                 ))
-              : "Brak danych"
+              : (
+                  <span className="text-red-400 font-bold">{`Wystąpił błąd: ${error}`}</span>
+                ) || "Brak danych"
             : [...Array(5)].map((_, idx) => <SkeletonItem key={idx} />)}
         </ListContainer>
       </Wrapper>

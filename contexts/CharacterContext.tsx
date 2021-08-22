@@ -5,10 +5,10 @@ import React, {
   useContext,
   useEffect,
   useReducer,
-  useState,
 } from "react";
 import { db } from "../firebase";
 import { charactersReducer } from "../reducers/charactersReducer";
+import { useAuth } from "./AuthContext";
 
 export interface Character {
   uid: string;
@@ -61,20 +61,23 @@ export function CharacterProvider({ children }: Props): ReactElement {
     characters: [],
   });
 
-  useEffect(() => {
-    const q = query(db.characters, orderBy("name"));
+  const { isLoading, currentUser } = useAuth();
 
-    getDocs(q)
-      .then(res => {
-        dispatch({
-          type: "SUCCESS",
-          characters: res.docs.map(doc => db.formatDoc(doc)),
+  useEffect(() => {
+    if (!isLoading) {
+      const q = query(db.characters, orderBy("name"));
+      getDocs(q)
+        .then(res => {
+          dispatch({
+            type: "SUCCESS",
+            characters: res.docs.map(doc => db.formatDoc(doc)),
+          });
+        })
+        .catch(error => {
+          dispatch({ type: "ERROR", error: error.code });
         });
-      })
-      .catch(error => {
-        dispatch({ type: "ERROR", error });
-      });
-  }, []);
+    }
+  }, [isLoading, currentUser]);
 
   return (
     <CharacterContext.Provider value={{ state, dispatch }}>
