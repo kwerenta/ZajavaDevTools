@@ -5,6 +5,7 @@ import {
   signOut,
   User,
 } from "firebase/auth";
+import { useRouter } from "next/router";
 import { createContext, useContext, useEffect, useState } from "react";
 import { auth } from "../firebase";
 
@@ -35,8 +36,10 @@ export function useAuth() {
 export const AuthProvider = ({ children }: Props) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   function logout() {
+    router.replace("/login");
     return signOut(auth);
   }
 
@@ -52,6 +55,11 @@ export const AuthProvider = ({ children }: Props) => {
 
     return unsubscribe;
   }, []);
+
+  useEffect(() => {
+    if (!isLoading && !currentUser && router.pathname !== "/login")
+      router.replace("/login");
+  }, [currentUser, isLoading, router]);
 
   const value: valueTypes = {
     isLoading,

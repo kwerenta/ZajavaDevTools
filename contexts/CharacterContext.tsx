@@ -1,5 +1,5 @@
 import { getDocs, orderBy, query, Timestamp } from "firebase/firestore/lite";
-import React, {
+import {
   createContext,
   ReactElement,
   useContext,
@@ -64,7 +64,7 @@ export function CharacterProvider({ children }: Props): ReactElement {
   const { isLoading, currentUser } = useAuth();
 
   useEffect(() => {
-    if (!isLoading) {
+    if (!isLoading && currentUser) {
       const q = query(db.characters, orderBy("name"));
       getDocs(q)
         .then(res => {

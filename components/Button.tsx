@@ -10,7 +10,7 @@ const VARIANTS: Record<Variant, string> = {
 
 interface Props {
   children: React.ReactNode;
-  onClick?: React.MouseEventHandler<HTMLButtonElement>;
+  onClick: React.MouseEventHandler<HTMLButtonElement>;
   variant?: Variant;
   className?: string;
   type?: "button" | "submit" | "reset";

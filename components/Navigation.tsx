@@ -1,13 +1,12 @@
 import Link from "next/link";
-import React, { ReactElement } from "react";
+import { ReactElement } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import LoginIcon from "./icons/LoginIcon";
 import UserIcon from "./icons/UserIcon";
 
 interface Props {}
 
 export default function Navigation({}: Props): ReactElement {
-  const { currentUser, isLoading, loginWithGoogle, logout } = useAuth();
+  const { isLoading, logout } = useAuth();
   return (
     <nav className="sticky max-h-screen top-0 z-30 flex items-center lg:flex-col lg:rounded-r-2xl bg-zajavaBlue-800 shadow-md lg:shadow-none">
       <Link href="/">
@@ -36,16 +35,12 @@ export default function Navigation({}: Props): ReactElement {
       <div className="ml-auto lg:mt-auto mr-4 lg:mx-0 lg:mb-4 flex items-center">
         <button
           disabled={isLoading}
-          onClick={() => {
-            currentUser ? logout() : loginWithGoogle();
-          }}
-          className={`w-14 h-14 rounded-full grid place-items-center transition-colors duration-300 ${
-            currentUser
-              ? "bg-zajavaBlue-500 hover:bg-zajavaBlue-700"
-              : "bg-red-900 hover:bg-red-700"
-          }`}
+          onClick={logout}
+          className={
+            "w-14 h-14 rounded-full grid place-items-center transition-colors duration-300 bg-zajavaBlue-500 hover:bg-zajavaBlue-700"
+          }
         >
-          {currentUser ? <UserIcon /> : <LoginIcon />}
+          <UserIcon />
         </button>
       </div>
     </nav>
