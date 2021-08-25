@@ -16,40 +16,42 @@ export interface Character {
   name: string;
   occupation: string;
   createdBy: string;
-  createdAt?: Timestamp;
+  createdAt?: string;
   skin?: string;
 }
 
-export interface State {
+export interface CharacterState {
   characters: Character[];
   isLoading: boolean;
   error?: string;
 }
 
-export type Action =
+export type CharacterAction =
   | { type: "SUCCESS"; characters: Character[] }
   | {
       type: "ERROR";
       error: string;
     }
-  | { type: "CREATE"; character: Character };
+  | { type: "CREATE"; character: Character }
+  | { type: "SORT"; sortBy: keyof Character };
 
-const initialValue: State = {
+interface CharacterValue extends CharacterState {
+  createCharacter: (character: Character) => void;
+  sortCharacters: (sortBy: keyof Character) => void;
+}
+
+const initialValue: CharacterValue = {
   characters: [],
   isLoading: true,
+  createCharacter: () => {},
+  sortCharacters: () => {},
 };
 
 interface Props {
   children: React.ReactNode;
 }
 
-const CharacterContext = createContext<{
-  state: State;
-  dispatch: React.Dispatch<Action>;
-}>({
-  state: initialValue,
-  dispatch: () => null,
-});
+const CharacterContext = createContext<CharacterValue>(initialValue);
 
 export function useCharacter() {
   return useContext(CharacterContext);
@@ -62,6 +64,12 @@ export function CharacterProvider({ children }: Props): ReactElement {
   });
 
   const { isLoading, currentUser } = useAuth();
+
+  const createCharacter = (character: Character) =>
+    dispatch({ type: "CREATE", character });
+
+  const sortCharacters = (sortBy: keyof Character) =>
+    dispatch({ type: "SORT", sortBy });
 
   useEffect(() => {
     if (!isLoading && currentUser) {
@@ -80,7 +88,9 @@ export function CharacterProvider({ children }: Props): ReactElement {
   }, [isLoading, currentUser]);
 
   return (
-    <CharacterContext.Provider value={{ state, dispatch }}>
+    <CharacterContext.Provider
+      value={{ ...state, createCharacter, sortCharacters }}
+    >
       {children}
     </CharacterContext.Provider>
   );

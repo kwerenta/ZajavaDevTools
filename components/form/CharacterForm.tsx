@@ -15,7 +15,7 @@ interface Props {
 
 export default function CharacterForm({ handleClose }: Props): ReactElement {
   const { currentUser } = useAuth();
-  const { dispatch } = useCharacter();
+  const { createCharacter } = useCharacter();
   return (
     <AsideFormContainer handleClose={handleClose}>
       <Formik
@@ -41,7 +41,7 @@ export default function CharacterForm({ handleClose }: Props): ReactElement {
             };
             const { id: uid } = await addDoc(db.characters, data);
             const character = { ...data, uid };
-            dispatch({ type: "CREATE", character });
+            createCharacter(character);
           } catch (e) {
             console.error(e);
           }

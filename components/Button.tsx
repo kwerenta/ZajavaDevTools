@@ -1,16 +1,17 @@
 import React, { ReactElement } from "react";
 
-type Variant = "PRIMARY" | "CANCEL" | "SECONDARY";
+type Variant = "PRIMARY" | "CANCEL" | "SECONDARY" | "TRANSPARENT";
 
 const VARIANTS: Record<Variant, string> = {
   CANCEL: "ring-2 ring-red-500 hover:bg-red-500",
   PRIMARY: "bg-zajavaBlue-600 hover:bg-zajavaBlue-700",
   SECONDARY: "ring-2 ring-zajavaBlue-600 hover:bg-zajavaBlue-600",
+  TRANSPARENT: "hover:bg-white/10",
 };
 
 interface Props {
   children: React.ReactNode;
-  onClick: React.MouseEventHandler<HTMLButtonElement>;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
   variant?: Variant;
   className?: string;
   type?: "button" | "submit" | "reset";
