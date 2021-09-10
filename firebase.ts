@@ -24,6 +24,7 @@ export const auth = getAuth(app);
 export const firestore = getFirestore(app);
 export const db = {
   characters: collection(firestore, "characters"),
+  quests: (uid: string) => collection(firestore, `characters/${uid}/quests/`),
   formatDoc: <Type>(doc: DocumentData): Type => ({
     ...doc.data(),
     uid: doc.id,
