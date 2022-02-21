@@ -16,7 +16,7 @@ export interface Character {
   name: string;
   occupation: string;
   createdBy: string;
-  createdAt?: string;
+  createdAt?: Timestamp;
   skin?: string;
 }
 
